@@ -1,7 +1,9 @@
 Everything is a combination of functions. No loops. No recursion. Just loops. Global variables allowed.
 
+-------> Is a hash function turing complete? (do the operations that *need* to be in a hash function allow it turing completeness)
+
 special functions: 
-w(x,y) -> while(func, func) -> while loop\
+w(x,y) -> while(func, func) -> while loop
 pad_1(input, wanted_length).
 
 functions take something and return something.
@@ -13,10 +15,10 @@ an "offering line" that says "beyond a point, i will not offer this to my offspr
 first 100 blocks in the generation are reserved for variables and the input.
 input goes to 0. distinguish between constants and memory locations by saying "c" after a number.
 -------------------------------
-a breeding map that occupies some special range in memory that details lines to exclude in the breeding process.
+a breeding map that occupies some special range in memory that details lines to exclude or include or both in the breeding process.
 
 ---------------------------------
-Since we have an integer placed pretty much everywhere, everything will "just work".
+Since we have an integer or  placed pretty much everywhere, everything will "just work".
 
 76 nand(0, 1)
 
@@ -26,3 +28,37 @@ non-circular right shift(1, num)
 XOR w/ some constant(1, num)
 
 the generator should *always* place these at the end. it should also choose reasonably-sized parameters for all of these.
+
+
+-> lets also throw in a random number generator. the catch is that it syntactically, it should only ever be initialized with some 
+constant. or rather, it interprets everything it receives as a constant (essentially always adding 'c' to everything).
+
+
+conditionals
+
+3 + 4 + 3 + 5 = 11
+should get 5 more
+
+-------
+dealing with invalid opcodes:
+
+1) do not ignore or halt on invalid opcodes. the language should simply "fill out" the opcode bits by creating whatever new opcodes i can use. (ideal)
+2) alternatively, if it detects an invalid opcode, just go and kill the leading bit of the opcode segment, and interpret the remaining lesser-order bits.
+
+-------------
+since we're putting the program counter in mem[2], do we still need a conditional, or a series of conditionals? yes.
+
+addifeq(x,y,z) add z to memory if x == y this is a ternary operator. joy. 
+addifneq(x,y,z) add z to memory if x != y
+addiflt(x,y,z) add z to memory if x < y
+addifgt(x,y,z) add z to memory if x > y
+
+should i restrict these operators to only modifying the program counter's value? no. although when i generate the code, i should place a high probablity
+on these things modifying the program counter only.
+
+
+
+slicing: how to slice. Well, we could just force the input to the thing in blocks... or not?
+-----------------------------
+what if we partially allowed the generated program to define the language itself...?
+too much complexity. Stick. To Fixed stuff. 

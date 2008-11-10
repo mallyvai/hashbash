@@ -1,0 +1,42 @@
+all funcs are of the form myfunc(num1, num2).
+num can refer either to a memory location, or a constant, if 'c' is appended.
+
+saying the following:
+loc myfunc(num1, num2)
+places the value from myfunc() into 'loc'
+
+unary operators should just ignore their second and third inputs.
+binary operators should just ignore their third input.
+the ternary "branching" operators should be fine.
+
+program counter is maintained in at mem[2]
+constant 0 is located at mem[0]
+
+
+----------------------------------------------------	
+nand
+and
+xor
+or
+not
+
+mod
+add
+bb
+
+clshift circular left shift
+crshift circ right shift
+lshift regular left shift
+rshift regular right shift
+
+
+padding
+append
+slicing operator
+
+addifeq(x,y,z) add z to memory if x == y this is a ternary operator. joy. 
+addifneq(x,y,z) add z to memory if x != y
+addiflt(x,y,z) add z to memory if x < y
+addifgt(x,y,z) add z to memory if x > y
+
+halt
