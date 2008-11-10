@@ -1,0 +1,28 @@
+Everything is a combination of functions. No loops. No recursion. Just loops. Global variables allowed.
+
+special functions: 
+w(x,y) -> while(func, func) -> while loop\
+pad_1(input, wanted_length).
+
+functions take something and return something.
+
+
+
+---------random idea-----------
+an "offering line" that says "beyond a point, i will not offer this to my offspring
+first 100 blocks in the generation are reserved for variables and the input.
+input goes to 0. distinguish between constants and memory locations by saying "c" after a number.
+-------------------------------
+a breeding map that occupies some special range in memory that details lines to exclude in the breeding process.
+
+---------------------------------
+Since we have an integer placed pretty much everywhere, everything will "just work".
+
+76 nand(0, 1)
+
+guaranteed append a reduction operator at the end. might as well provide some special functions for this:
+mod(1, num)
+non-circular right shift(1, num)
+XOR w/ some constant(1, num)
+
+the generator should *always* place these at the end. it should also choose reasonably-sized parameters for all of these.
