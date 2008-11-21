@@ -11,7 +11,7 @@
 /* #undef HAVE_LIBGSL */
 
 /* Define to 1 if you have the `gslcblas' library (-lgslcblas). */
-/* #undef HAVE_LIBGSLCBLAS */
+#define HAVE_LIBGSLCBLAS 1
 
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1

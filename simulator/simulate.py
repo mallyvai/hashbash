@@ -67,6 +67,7 @@ IMM = 1
 MAX_CYCLES = 50000
 
 # B and C should ALWAYS be directly above A.
+#WI is Word Index; aka the location in memory
 WI_INPUT_START = 12 #A) The index of the starting word the input will be dumped into every time the magic function is called.
 WI_TOTAL_INPUT_SIZE = 10 #B) The index of the word the total size of the input is going to be dumped into every time the magic function is called 
 WI_BLOCK_SIZE = 11#C) The index of the word the input's blocksize will be dumped into every time the magic function is called
@@ -76,18 +77,17 @@ WI_PROGRAM_COUNTER = 0 #Index in which the program counter is stored
 def restricted_left_shift(num, shift_amount, num_bits):
 	word_mask = (2**num_bits) - 1
 	return (num << shift_amount) & word_mask;
-
 def restricted_circ_left_shift(num, shift_amount, num_bits):
 	return restricted_left_shift(num, shift_amount, num_bits) | (num >> (num_bits - shift_amount))
 def restricted_circ_right_shift(num, shift_amount, num_bits):
 	return restricted_circ_left_shift(num, num_bits-shift_amount, num_bits)
 
-class file_struct:
+class st_file:
 	def __init__(self, filename)
 		self.filename = filename
-		self.whence = 0
-		self.seek = 0
-		self.size = os.stat(
+		self.fh = open(filename, 'rb')
+		self.cursor_pos = 0
+		self.size = os.stat(filename)
 
 class Program:
 	"""
@@ -96,11 +96,17 @@ class Program:
 	one or more cycles at a time.
 	"""
 		
-	def _iter_input(self):
+	def _iter_input(self, forward):
+		self.memory[WI_TOTAL_INPUT_SIZE] = self.file_stuff.size
 		
+		if forward == 1:
+			self.memory[
+		else:
+
+
 	def __init__(self, filename):
 		self.memory = [0 for i in xrange(0, WI_PROGRAM_START)]
-		
+
 		fh = open(sys.argv[1], 'r')
 		lines = fh.readlines()
 		fh.close()
@@ -108,11 +114,10 @@ class Program:
 		while len(self.memory) < NUM_LINES:
 			self.memory.append(0)
 		self.memory[WI_PROGRAM_COUNTER] = WI_PROGRAM_START
-		self.filename = filename
-		self.whence = 0
-		se
+		self.file_stuff = st_file(filename)
 		self.num_cycles	= 0
-			
+		self.halted = 0
+	
 	def next_step(self, num_steps):
 		m = self.memory
 		pc = m[WI_PROGRAM_COUNTER]
@@ -183,8 +188,11 @@ class Program:
 			if x < y:
 				m[dest] = (m[dest] + z) % MAX_WORD_SIZE
 		elif f_op is ops["iterinput"]:
-			
-		"halt": 16 }
+			self._iter_inputer(msd_x)
+		syntaxerror -> DO THIS
+		elif f_op is ops["halt"]:
+			self.halted = 1
+		
 
 
 def Denary2Binary(n):

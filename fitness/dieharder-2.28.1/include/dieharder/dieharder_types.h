@@ -38,6 +38,7 @@
  GSL_VAR const gsl_rng_type *gsl_rng_dev_random;
  GSL_VAR const gsl_rng_type *gsl_rng_dev_arandom;
  GSL_VAR const gsl_rng_type *gsl_rng_dev_urandom;
+ GSL_VAR const gsl_rng_type *gsl_my_test_rng; /*!!!!!! test*/
 
  GSL_VAR const gsl_rng_type *gsl_rng_r_wichmann_hill;	/* edd May 2007 */
  GSL_VAR const gsl_rng_type *gsl_rng_r_marsaglia_mc;	/* edd May 2007 */

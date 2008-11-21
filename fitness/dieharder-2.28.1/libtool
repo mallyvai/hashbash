@@ -4,7 +4,7 @@
 # Generated automatically by  (GNU dieharder 2.28.1)
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 #
-# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
+# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
 # Free Software Foundation, Inc.
 #
 # This file is part of GNU Libtool:
@@ -243,6 +243,10 @@ predeps=""
 # shared library.
 postdeps=""
 
+# The directories searched by this compiler when creating a shared
+# library
+compiler_lib_search_dirs=""
+
 # The library search path used internally by the compiler when linking
 # a shared library.
 compiler_lib_search_path=""
@@ -322,13 +326,13 @@ hardcode_automatic=no
 variables_saved_for_relink="PATH LD_LIBRARY_PATH LD_RUN_PATH GCC_EXEC_PREFIX COMPILER_PATH LIBRARY_PATH"
 
 # Whether libtool must link a program against all its dependency libraries.
-link_all_deplibs=unknown
+link_all_deplibs=no
 
 # Compile-time system search path for libraries
-sys_lib_search_path_spec="/usr/lib /lib /usr/local/lib"
+sys_lib_search_path_spec="/usr/lib/gcc/i486-linux-gnu/4.2.4 /usr/lib /lib"
 
 # Run-time system search path for libraries
-sys_lib_dlsearch_path_spec="/usr/lib /lib /lib/i486-linux-gnu /usr/lib/i486-linux-gnu /usr/local/lib /usr/lib/panda3d "
+sys_lib_dlsearch_path_spec="/lib /usr/lib /lib/i486-linux-gnu /usr/lib/i486-linux-gnu /usr/local/lib /usr/lib/panda3d "
 
 # Fix the shell variable $srcfile for the compiler.
 fix_srcfile_path=""
@@ -343,7 +347,7 @@ export_symbols_cmds="\$NM \$libobjs \$convenience | \$global_symbol_pipe | \$SED
 extract_expsyms_cmds=""
 
 # Symbols that should not be listed in the preloaded symbols.
-exclude_expsyms="_GLOBAL_OFFSET_TABLE_"
+exclude_expsyms="_GLOBAL_OFFSET_TABLE_|_GLOBAL__F[ID]_.*"
 
 # Symbols that must always be exported.
 include_expsyms=""

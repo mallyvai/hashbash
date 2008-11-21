@@ -1,7 +1,7 @@
-rngav.lo: rngav.c /usr/include/stdlib.h /usr/include/features.h \
+rngav.lo rngav.o: rngav.c /usr/include/stdlib.h /usr/include/features.h \
   /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
-  /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h \
-  /usr/lib/gcc/x86_64-redhat-linux/4.1.2/include/stddef.h \
+  /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h \
+  /usr/lib/gcc/i486-linux-gnu/4.2.4/include/stddef.h \
   /usr/include/sys/types.h /usr/include/bits/types.h \
   /usr/include/bits/typesizes.h /usr/include/time.h /usr/include/endian.h \
   /usr/include/bits/endian.h /usr/include/sys/select.h \
@@ -11,12 +11,12 @@ rngav.lo: rngav.c /usr/include/stdlib.h /usr/include/features.h \
   /usr/include/string.h /usr/include/bits/string.h \
   /usr/include/bits/string2.h /usr/include/stdio.h /usr/include/libio.h \
   /usr/include/_G_config.h /usr/include/wchar.h \
-  /usr/lib/gcc/x86_64-redhat-linux/4.1.2/include/stdarg.h \
+  /usr/lib/gcc/i486-linux-gnu/4.2.4/include/stdarg.h \
   /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
   /usr/include/bits/stdio.h /usr/include/math.h \
   /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h \
   /usr/include/bits/mathcalls.h /usr/include/bits/mathinline.h \
-  /usr/lib/gcc/x86_64-redhat-linux/4.1.2/include/float.h
+  /usr/lib/gcc/i486-linux-gnu/4.2.4/include/float.h
 
 /usr/include/stdlib.h:
 
@@ -28,9 +28,9 @@ rngav.lo: rngav.c /usr/include/stdlib.h /usr/include/features.h \
 
 /usr/include/gnu/stubs.h:
 
-/usr/include/gnu/stubs-64.h:
+/usr/include/gnu/stubs-32.h:
 
-/usr/lib/gcc/x86_64-redhat-linux/4.1.2/include/stddef.h:
+/usr/lib/gcc/i486-linux-gnu/4.2.4/include/stddef.h:
 
 /usr/include/sys/types.h:
 
@@ -72,7 +72,7 @@ rngav.lo: rngav.c /usr/include/stdlib.h /usr/include/features.h \
 
 /usr/include/wchar.h:
 
-/usr/lib/gcc/x86_64-redhat-linux/4.1.2/include/stdarg.h:
+/usr/lib/gcc/i486-linux-gnu/4.2.4/include/stdarg.h:
 
 /usr/include/bits/stdio_lim.h:
 
@@ -90,4 +90,4 @@ rngav.lo: rngav.c /usr/include/stdlib.h /usr/include/features.h \
 
 /usr/include/bits/mathinline.h:
 
-/usr/lib/gcc/x86_64-redhat-linux/4.1.2/include/float.h:
+/usr/lib/gcc/i486-linux-gnu/4.2.4/include/float.h:

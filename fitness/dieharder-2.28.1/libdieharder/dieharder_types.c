@@ -115,6 +115,8 @@ const gsl_rng_type **dieharder_rng_types_setup(void)
     fclose(test_fp);
   }
 
+	ADD(gsl_my_test_rng);
+
   /*
    * This will let me change a single word in startup.c in dieharder
    * and the program should "just work" with my custom generators and
