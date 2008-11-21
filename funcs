@@ -12,8 +12,18 @@ the ternary "branching" operators should be fine.
 program counter is maintained in at mem[2]
 constant 0 is located at mem[0]
 
+68-bit words.
+lowest 4 bits for opcode (16 opcode)
+60 / 4 = 15 bits each for parameter; 2^15 absolute-addressable memory locations.
+Each parameter field and dest also needs one additional bit to indicate whether or not its an immediate.
+For dest, if its not an immediate, it functions as a pointer.
 
-----------------------------------------------------	
+
+format: location, z, y, x, opcode
+opcode = 15
+z = 11111111111111110000
+
+----------------------------------------------------
 nand
 and
 xor
@@ -21,22 +31,19 @@ or
 not
 
 mod
-add
-bb
+add x, y, z - if z's MSB is 0, add. if 1, sub.
 
-clshift circular left shift
-crshift circ right shift
-lshift regular left shift
-rshift regular right shift
+cshift circular shift ( LSB of z is 0 means right shift, 1 means left by that much)
+shift regular shift  (same as above)
 
-
-padding
-append
-slicing operator
+padding - no, pointless. we have shifts
+slicing operator(?)
 
 addifeq(x,y,z) add z to memory if x == y this is a ternary operator. joy. 
 addifneq(x,y,z) add z to memory if x != y
 addiflt(x,y,z) add z to memory if x < y
-addifgt(x,y,z) add z to memory if x > y
+
+nin x if LSB of x is 1, go forward (dump the next input block); otherwise, go backwards.
+dumped input block is of size
 
 halt

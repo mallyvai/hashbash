@@ -4,48 +4,22 @@
 #include <stdio.h>
 #include <string.h>
 
-#define NUMMEMORY 65536 /* maximum number of words in memory */
-#define NUMREGS 8 /* number of machine registers */
+#define NUMMEMORY 32768 /* maximum number of words in memory */
 #define MAXLINELENGTH 1000	
-
-#define M_OPCODE 29360128
-#define M_REGA 3670016
-#define M_REGB 458752
-#define M_DESTREG 7
-#define M_OFFSETFIELD 65535
-
-#define B_OPCODE 22
-#define B_REGA 19
-#define B_REGB 16
-#define B_DESTREG 0
-#define B_OFFSETFIELD 0
-
-#define I_ADD	0
-#define	I_NAND	1
-#define I_LW	2
-#define I_SW	3
-#define	I_BEQ	4
-#define	I_JALR	5
-#define	I_HALT	6
-#define	I_NOOP	7
 
 typedef struct stateStruct {
     int pc;
     int mem[NUMMEMORY];
-    int reg[NUMREGS];
     int numMemory;
 } stateType;
 
 void printState(stateType *);
-int convertNum(int num);
+//int convertNum(long num);
 
 void initialize(stateType *);
 void simulate(stateType *);
 
-int getOpcode(int num);
-int getRegA(int num);
-int getRegB(int num);
-int getOffsetField(int num);
+int getOpcode(long num);
 
 
 int

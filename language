@@ -61,4 +61,16 @@ on these things modifying the program counter only.
 slicing: how to slice. Well, we could just force the input to the thing in blocks... or not?
 -----------------------------
 what if we partially allowed the generated program to define the language itself...?
-too much complexity. Stick. To Fixed stuff. 
+too much complexity. Stick. To Fixed stuff.
+------------------------------------------------
+
+my options for getting input into the function:
+just reserve some contiguous block at the front of the program for the thing to be hashed.
+have a 'magic function' that is called that puts the next block of input into a certain reserved
+input block.
+
+my options for getting output from the function;
+look at some specific reserved output zone - just a series of words.
+other less effective methods:
+
+i'm going to go with option 2 (magic function) for the input, and go with my only real option for the output

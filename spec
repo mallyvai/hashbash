@@ -13,3 +13,12 @@ I'm going try this approach first.
 
 -Vaibhav
 
+
+CL 2
+123456
+345612
+
+CR 2
+561234
+ 2
+345612
