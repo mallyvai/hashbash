@@ -138,21 +138,26 @@ class st_input:
 		num_bits = 8
 	
 	def next(num_bits):
-		mask = 2**num_bits - 1
+		mask = BLOCK_MASK
 		mask <<= self.cursor
 		self.cursor += num_bits
+		self.cursor %= self.bitsize
 		return reverse_bits(mask & self.input_bits)
-	"""
-	Return the previous N bits of the input; loop around.
-	Mod num_bits with total bits.
-	"""
+	
+	def prev(num_bits):
+		mask = BLOCK_MASK
+		mask <<= self.cursor
+		self.cursor -= num_bits
+		self.cursor %= self.bitsize
+		return reverse_bits(mask & self.input_bits)
+		
 	#def prev(num_bits):
 		
 
 class Program:
 	"""
 	A class for representing and simulating a program.
-	Has no notion of "maximum cycles"; just blindly steps through	
+	Has no notion of "maximum cycles"; just blindly steps through
 	one cycle at a time.
 	"""
 
@@ -160,22 +165,25 @@ class Program:
 	#Same with if we're at the beginning and go "backward" again.
 
 	def _iter_input(self, forward):
+		bits = None
 		if forward:
 			bits = reverse_bits(self.st_in.next(BLOCK_SIZE * NUM_INPUT_BLOCKS))
-			i = WI_INPUT_START
-			while i <= WI_INPUT_END:
-				self.memory[i] = reverse_bits(bits & BLOCK_MASK)
-				bits >>= BLOCK_SIZE
-				i += 1
+		else:
+			bits = reverse_bits(self.st_in.prev(BLOCK_SIZE * NUM_INPUT_BLOCKS))
 		
-			
+		i = WI_INPUT_START
+		while i <= WI_INPUT_END:
+			self.memory[i] = reverse_bits(bits & BLOCK_MASK)
+			bits >>= BLOCK_SIZE
+			i += 1
+	
 	def __init__(self, inputstring):
 		self.memory = [0 for i in xrange(0, WI_PROGRAM_START)]
 
 		fh = open(sys.argv[1], 'r')
 		lines = fh.readlines()
 		fh.close()
-		
+
 		self.memory.append([int(line) for line in lines if line[0] != '#'])
 		while len(self.memory) < NUM_LINES:
 			self.memory.append(0)
