@@ -19,9 +19,10 @@ import sys
 import os
 import math
 
-NUM_LINES =  65536
-MAX_WORD_SIZE = 0x100000000000000000
 NUM_BITS = 68
+NUM_LINES =  65536
+MAX_WORD_SIZE = (2**NUM_BITS) - 1
+
 
 """Shifts to get fields"""
 S_OPCODE = 0
@@ -67,18 +68,22 @@ ops = opcodes = {
 IMM = 1
 MAX_CYCLES = 50000
 
-#WI is Word Index; aka the location in memory
+
 BLOCK_SIZE = NUM_BITS
 BLOCK_MASK = 2**BLOCK_SIZE - 1
-NUM_BLOCKS = 2 * 3 *  BLOCK_SIZE # Number of blocks a call to iterinput will start
-
+NUM_INPUT_BLOCKS = 2 * 3 *  BLOCK_SIZE # Number of blocks a call to iterinput will start.
+NUM_OUTPUT_BLOCKS = 2 
+#WI is Word Index; aka the location in memory
 WI_PROGRAM_COUNTER = 0 #Index in which the program counter is stored
 
 WI_TOTAL_INPUT_SIZE = 12 #The index of the word the total size of the input is going to be dumped into every time every time iterinput is called
 WI_BLOCK_SIZE = WI_TOTAL_INPUT_SIZE + 2 #Index of the word the block size for the input is going to be dumped into every time iterinput is called
 WI_NUM_BLOCKS = WI_BLOCK_SIZE + 2 #Index for number of blocks a call to iterinput will create
 WI_INPUT_START = WI_NUM_BLOCKS + 2 #Index of the word the input's going to start in
-WI_PROGRAM_START = WI_INPUT_START + (NUM_BLOCKS) #Index of the word the program itself is going to start in.
+WI_INPUT_END = WI_INPUT_START + NUM_INPUT_BLOCKS - 1
+WI_OUTPUT_START = WI_INPUT_END + 1
+WI_OUTPUT_END = WI_OUTPUT_START + NUM_OUTPUT_BLOCKS - 1
+WI_PROGRAM_START = WI_OUTPUT_END + 1 #Index of the word the program itself is going to start in.
 
 def restricted_left_shift(num, shift_amount, num_bits):
 	word_mask = (2**num_bits) - 1
@@ -100,6 +105,22 @@ def string_to_integer(string):
 		
 	return ret_int
 
+def reverse_bits(num):
+	ret_int = 0
+	
+	while num > 0:
+		ret_int <<= 1
+		ret_int += (num & 1)
+		num >>= 1
+	return ret_int
+
+def test_reverse_bits():
+	print "13 should be 11", 13, reverse_bits(13)
+	print "0 should be 0:", 0, reverse_bits(0)	
+	print "7 should be 7:", 7, reverse_bits(7)
+
+
+
 class st_input:
 	"""
 	input_string gets converted into an integer
@@ -108,25 +129,24 @@ class st_input:
 	"""
 	def __init__(self, input_string):
 		self.input_string = input_string
+		self.input_bits = reverse_bits(string_to_integer(input_string))
 		self.bitsize = len(input_string) * 8
 		self.cursor_small = 0  #represents the index of the small *from the next block*
 		self.cursor_big = 0 #represents the index of the big
-	
-	"""
-	Return the next num_bits bits of the input; loop around.
-	Mod num_bits with total bits.		
-	"""
-	def next(num_bits):
-		num_bits %= self.bitsize
-		new_cursor_big = self.cursor_big + math.floor(num_bits / 8) #Gives index of character that the next call to next() should start from
-		string = [self.cursor_big:new_cursor_big +1]
+		self.cursor = 0
 		
-
+		num_bits = 8
+	
+	def next(num_bits):
+		mask = 2**num_bits - 1
+		mask <<= self.cursor
+		self.cursor += num_bits
+		return reverse_bits(mask & self.input_bits)
 	"""
 	Return the previous N bits of the input; loop around.
 	Mod num_bits with total bits.
 	"""
-	def prev(num_bits):
+	#def prev(num_bits):
 		
 
 class Program:
@@ -140,13 +160,15 @@ class Program:
 	#Same with if we're at the beginning and go "backward" again.
 
 	def _iter_input(self, forward):
+		if forward:
+			bits = reverse_bits(self.st_in.next(BLOCK_SIZE * NUM_INPUT_BLOCKS))
+			i = WI_INPUT_START
+			while i <= WI_INPUT_END:
+				self.memory[i] = reverse_bits(bits & BLOCK_MASK)
+				bits >>= BLOCK_SIZE
+				i += 1
 		
-		while self.st_in.cursor_big < NUM_BLOCKS and 
-			j = 0
-		self.st_in.cursor
-		#Greedy algorithm hooray.
-		
-
+			
 	def __init__(self, inputstring):
 		self.memory = [0 for i in xrange(0, WI_PROGRAM_START)]
 
@@ -233,16 +255,16 @@ class Program:
 				m[dest] = restricted_circ_right_shift(x, y, num_bits)
 		elif f_op is ops["addifeq"]:
 			if x == y:
-				m[dest] = (m[dest] + z) % MAX_WORD_SIZE
+				m[dest] = (m[dest] + z) % MAX_WORD_SIZE + 1
 		elif f_op is ops["addifneq"]:
 			if x != y:
-				m[dest] = (m[dest] + z) % MAX_WORD_SIZE
+				m[dest] = (m[dest] + z) % MAX_WORD_SIZE + 1
 		elif f_op is ops["addiflt"]:
 			if x < y:
-				m[dest] = (m[dest] + z) % MAX_WORD_SIZE
+				m[dest] = (m[dest] + z) % MAX_WORD_SIZE + 1
 		
 		elif f_op is ops["iterinput"]:
-			self._iter_inpute(msd_x)
+			self._iter_input(msd_x is 1)
 		
 		elif f_op is ops["halt"]:
 			self.halted = True
@@ -266,3 +288,4 @@ def Denary2Binary(n):
 		n = n >> 1
 		#
 	return bStr
+
