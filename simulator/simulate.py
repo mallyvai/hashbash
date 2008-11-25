@@ -140,10 +140,18 @@ class Program:
 			raise Halted
 		
 		get_field = lambda instr, mask, shift: (instr & mask) >> shift 
+		
 		def get_msd(field, mask):
 			if field & mask == 0:
 				return 0
 			return 1
+		
+		def get_xor(field):
+			ret = 1 & field
+			while field != 0:
+				field >>= 1
+				ret ^= (1 & field)
+			return ret
 		
 		f_op = get_field(instr, M_OPCODE, S_OPCODE)
 		f_x = get_field(instr, M_X, S_X)
@@ -151,26 +159,33 @@ class Program:
 		f_z = get_field(instr, M_Z, S_Z)
 		f_dest = get_field(instr, M_DEST, S_DEST)
 		
+		"""
 		msd_x = get_msd(f_x, B_X)
 		msd_y = get_msd(f_y, B_Y)
 		msd_z = get_msd(f_z, B_Z)
 		msd_dest = get_msd(f_dest, B_DEST)
+		"""
+		
+		xor_x = get_xor(f_x)
+		xor_y = get_xor(f_y)
+		xor_z = get_xor(f_z)
+		xor_dest = get_xor(f_dest)
 		
 		x = None
 		y = None
 		z = None
 		dest = None
 		
-		if msd_x is IMM: x = f_x
+		if xor_x is IMM: x = f_x
 		else: x = m[f_x]
 		
-		if msd_y is IMM: y = f_y
+		if xor_y is IMM: y = f_y
 		else: y = m[f_y]
 		
-		if msd_z is IMM: z = f_z
+		if xor_z is IMM: z = f_z
 		else: z = m[f_z]
 		
-		if msd_dest is IMM: dest = f_dest
+		if xor_dest is IMM: dest = f_dest
 		else: dest = m[f_dest]
 		
 		"""Now lets go and actually do the calculations..."""
@@ -182,15 +197,15 @@ class Program:
 		
 		elif f_op is ops["mod"]: m[dest] = x % y
 		elif f_op is ops["add"]: 
-			if msd_z == 1: y *= -1 #sub if the relevant bit is 1
+			if xor_z == 1: y *= -1 #sub if the relevant bit is 1
 			m[dest] = (x + y) % 0x100000000000000000 #Because we have 68-bit words, 2^68 is the modulus
 		elif f_op is ops["shift"]:
-			if msd_z == 1:
+			if xor_z == 1:
 				m[dest] = restricted_left_shift(x, y, WORD_SIZE)	 #shift left
 			else:  #shift right
 				m[dest] = x >> y
 		elif f_op is ops["cshift"]:
-			if msd_z == 1:
+			if xor_z == 1:
 				m[dest] = restricted_circ_left_shift(x, y, WORD_SIZE)
 			else:
 				m[dest] = restricted_circ_right_shift(x, y, WORD_SIZE)
@@ -220,26 +235,6 @@ class Program:
 		
 		elif f_op is ops["halt"]:
 			self.halted = True
-		
-
-
-def Denary2Binary(n):
-	#
-	'''convert denary integer n to binary string bStr'''
-	#
-	bStr = ''
-	#
-	if n < 0: raise ValueError, "must be a positive integer"
-	#
-	if n == 0: return '0'
-	#
-	while n > 0:
-	#
-		bStr = str(n % 2) + bStr
-		#
-		n = n >> 1
-		#
-	return bStr
 
 def simulate():
 	memory = [0 for i in xrange(0, WI_PROGRAM_START)]
