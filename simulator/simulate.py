@@ -225,9 +225,6 @@ class Program:
 		elif f_op is c.ops["setifeq"]:
 			if x == y:
 				m[dest] = z
-		elif f_op is c.ops["setifneq"]:
-			if x != y:
-				m[dest] = z
 		elif f_op is c.ops["setiflt"]:
 			if x < y:
 				m[dest] = z
@@ -275,7 +272,8 @@ def simulate():
 
 	tracker = MemTrack(memory)
 
-	input_string = raw_input("String you want to hash:\n")
+	#input_string = raw_input("String you want to hash:\n")
+	input_string =  """memory.extend([int(line) for line in lines if line[0] != '#' and len(line.strip()) > 0]) ValueError: invalid literal for int() with base 10:"""
 	print "beginning simulation"
 	p = Program(memory, input_string)
 	

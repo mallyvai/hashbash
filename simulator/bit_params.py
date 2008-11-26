@@ -1,6 +1,6 @@
 ENABLE_DEBUG = True
 
-MAX_CYCLES = 10
+MAX_CYCLES = 100
 
 NUM_BITS = 68
 NUM_LINES =  65536
@@ -43,10 +43,9 @@ ops = opcodes = {
 		"addifneq": 10,
 		"addiflt": 11,
 		"setifeq": 12,
-		"setifneq": 13,
+		"halt": 13,
 		"setiflt": 14,
-		"iterinput": 15,
-		"halt": 16 }
+		"iterinput": 15}
 
 IMM = 1
 
