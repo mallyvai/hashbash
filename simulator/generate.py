@@ -12,7 +12,7 @@ class BadOperation(Exception):
 
 def parse_instr(instr):
 	def generate_instr(op, x, y, z, dest):
-		return (c.ops[op] << c.S_OPCODE) + (x << c.S_X) + (y << c.S_Y) + (z << c.S_Z)
+		return (c.ops[op] << c.S_OPCODE) + (x << c.S_X) + (y << c.S_Y) + (z << c.S_Z) + (dest << c.S_DEST)
 	
 	def adjust_field(field):
 		#Hardwired immediate bit. Less flexible. Screw it.
@@ -41,7 +41,7 @@ def parse_instr(instr):
 
 
 
-cond_set = ["setifeq", "setifneq", "setiflt"]
+cond_set = ["setifeq", "setiflt"]
 cond_add = ["addifeq", "addifneq", "addiflt"]
 comp_ops = ["mod", "add", "cshift", "shift"]
 simp_ops = ["nand", "xor", "or", "not"]
@@ -65,18 +65,17 @@ def gen_program():
 		add 1 to tempvar mem[2]
 		goto start if mem[2] < 20
 	"""
-	start = "0 iterinput 0 0 0"
+	start = "0 iterinput 0 0 0" #428
 	loop_1 = str(2) + " add 2m 1 0"
 	loop_2 = str(c.WI_PROGRAM_COUNTER) + " setiflt 2m 20 " + str(c.WI_PROGRAM_START)
-	end = "0 halt 0 0 0"
+	end = "0 halt 0 0 0"	#431
 	
-	program = '\n'.join([start, loop_1, loop_2, end])
+	program = '\n'.join([start, loop_1,loop_1,loop_1, loop_2, end])
 	
-	return program
+	fh = open("/tmp/prog", 'w')
+	p = program.split("\n")
+	
+	fh.writelines([str(parse_instr(i))+"\n" for i in p])
+	fh.close()
 
-fh = open("/tmp/prog", 'w')
-p = gen_program().split("\n")
-print c.Denary2Binary(p)
-fh.writelines([str(parse_instr(i))+"\n" for i in p])
-fh.close()
-
+gen_program()

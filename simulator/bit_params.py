@@ -1,6 +1,6 @@
 ENABLE_DEBUG = True
 
-MAX_CYCLES = 100
+MAX_CYCLES = 20
 
 NUM_BITS = 68
 NUM_LINES =  65536
@@ -21,13 +21,6 @@ M_Y = M_X << 16
 M_Z = M_Y << 16
 M_DEST = M_Z << 16
 
-"""MSDigit mask for fields"""
-B_OPCODE = 8
-B_X = 32768
-B_Y = 32768
-B_Z = 32768
-B_DEST = 32768
-
 """Opcode values with shorthand"""
 ops = opcodes = {
 		"and": 0,
@@ -46,6 +39,8 @@ ops = opcodes = {
 		"halt": 13,
 		"setiflt": 14,
 		"iterinput": 15}
+DictInvert = lambda d: dict(zip(d.values(), d.keys()))
+r_ops = DictInvert(ops)
 
 IMM = 1
 
