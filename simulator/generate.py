@@ -67,10 +67,10 @@ def gen_program():
 	"""
 	start = "0 iterinput 0 0 0" #428
 	loop_1 = str(2) + " add 2m 1 0"
-	loop_2 = str(c.WI_PROGRAM_COUNTER) + " setiflt 2m 20 " + str(c.WI_PROGRAM_START)
+	loop_2 = str(c.WI_PROGRAM_COUNTER) + " setiflt 2m 50 " + str(c.WI_PROGRAM_START)
 	end = "0 halt 0 0 0"	#431
 	
-	program = '\n'.join([start, loop_1, loop_2, end])
+	program = '\n'.join([loop_1,loop_1,loop_1,end])
 	
 	fh = open("/tmp/prog", 'w')
 	p = program.split("\n")

@@ -209,6 +209,7 @@ class Program:
 		elif f_op == c.ops["mod"]: m[dest] = x % y
 		elif f_op == c.ops["add"]: 
 			if xor_z == 1: y *= -1 #sub if the relevant bit is 1
+			print "X+Y=", x+y
 			m[dest] = (x + y) % 0x100000000000000000 #Because we have 68-bit words, 2^68 is the modulus
 		elif f_op == c.ops["shift"]:
 			if xor_z == 1:
@@ -275,7 +276,9 @@ class MemTrack:
 def simulate():
 	memory = [0 for i in xrange(0, c.WI_PROGRAM_START)]
 
-	fh = open(sys.argv[1], 'r')
+	#!!!
+	"""fh = open(sys.argv[1], 'r')"""
+	fh = open("/tmp/prog", 'r')
 	lines = fh.readlines()
 	fh.close()
 	
