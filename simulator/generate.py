@@ -25,7 +25,7 @@ def parse_instr(instr):
 	fields = instr.split()
 	trans_fields = []
 
-	print fields
+	print "FIELDS: ", fields
 	op = fields.pop(1)
 	if op not in c.ops:
 		raise BadOperation(op + " doesn't exist.")
@@ -70,12 +70,10 @@ def gen_program():
 	loop_2 = str(c.WI_PROGRAM_COUNTER) + " setiflt 2m 20 " + str(c.WI_PROGRAM_START)
 	end = "0 halt 0 0 0"	#431
 	
-	program = '\n'.join([start, loop_1,loop_1,loop_1, loop_2, end])
+	program = '\n'.join([start, loop_1, loop_2, end])
 	
 	fh = open("/tmp/prog", 'w')
 	p = program.split("\n")
-	
+	print "PROGRAM IS: ", p
 	fh.writelines([str(parse_instr(i))+"\n" for i in p])
 	fh.close()
-
-gen_program()

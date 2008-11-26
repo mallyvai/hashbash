@@ -292,7 +292,7 @@ def simulate():
 	p = Program(memory, input_string)
 	
 	i = 0
-	while i < c.MAX_CYCLES:
+	while i < c.MAX_CYCLES and p.is_halted == False:
 		#if i % 500 == 0:
 		#	print "Cycle", i
 		tracker.next_state(p.memory)
