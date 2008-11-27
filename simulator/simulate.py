@@ -39,6 +39,11 @@ def restricted_circ_right_shift(num, shift_amount, num_bits):
 
 get_field = lambda instr, mask, shift: (instr & mask) >> shift 
 
+def get_msd(field, mask):
+	if field & mask == 0:
+		return 0
+	return 1
+
 class Halted(Exception):
 	def __init__(self, value):
 		self.value = value
@@ -154,8 +159,8 @@ class Program:
 	def next_step(self):
 		if self.is_halted:
 			raise Halted("Program halted")
-	
 		
+			
 		m = self.memory
 		pc = m[c.WI_PROGRAM_COUNTER]
 		m[c.WI_PROGRAM_COUNTER] += 1 #pc++
@@ -174,6 +179,11 @@ class Program:
 		f_z = get_field(instr, c.M_Z, c.S_Z)
 		f_dest = get_field(instr, c.M_DEST, c.S_DEST)
 
+		msd_x = get_msd(f_x, c.B_X)
+		msd_y = get_msd(f_y, c.B_Y)
+		msd_z = get_msd(f_z, c.B_Z)
+		msd_dest = get_msd(f_dest, c.B_DEST)
+		
 		xor_x = get_xor(f_x)
 		xor_y = get_xor(f_y)
 		xor_z = get_xor(f_z)
@@ -184,17 +194,34 @@ class Program:
 		z = None
 		dest = None
 		
-		if xor_x == c.IMM: x = f_x
-		else: x = m[f_x]
+		if msd_x == c.IMM:
+			x = f_x & c.M_FVAL
+			print "x is imm"
+		else: 
+			x = m[f_x]
+			print "pulling x from mem", f_x
 		
-		if xor_y == c.IMM: y = f_y
-		else: y = m[f_y]
+		if msd_y == c.IMM:
+			y = f_y & c.M_FVAL
+			print "y is imm"
+		else: 
+			y = m[f_y]
+			print "pulling y from mem", f_y
 		
-		if xor_z == c.IMM: z = f_z
-		else: z = m[f_z]
+		if msd_z == c.IMM:
+			z = f_z & c.M_FVAL
+			print "y is imm"
 		
-		if xor_dest == c.IMM: dest = f_dest
-		else: dest = m[f_dest]
+		else:
+			z = m[f_z]
+			print "pulling z from mem", f_z
+		
+		if msd_dest == c.IMM:
+			dest = f_dest & c.M_FVAL
+			print "dest is imm"
+		else: 
+			dest = m[f_dest] & c.M_FVAL
+			print "pulling dest from mem"
 		
 		dbg_brk()
 		print c.r_ops[f_op]
@@ -210,6 +237,7 @@ class Program:
 		elif f_op == c.ops["add"]: 
 			if xor_z == 1: y *= -1 #sub if the relevant bit is 1
 			print "X+Y=", x+y
+			print "X", x,"","Y", y
 			m[dest] = (x + y) % 0x100000000000000000 #Because we have 68-bit words, 2^68 is the modulus
 		elif f_op == c.ops["shift"]:
 			if xor_z == 1:
@@ -307,7 +335,6 @@ def simulate():
 	print out
 	tracker.output()
 	return out
-	dbg_brk()
 
 generate.gen_program()
 simulate()

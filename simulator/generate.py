@@ -14,12 +14,14 @@ def parse_instr(instr):
 	def generate_instr(op, x, y, z, dest):
 		return (c.ops[op] << c.S_OPCODE) + (x << c.S_X) + (y << c.S_Y) + (z << c.S_Z) + (dest << c.S_DEST)
 	
+	imm_bit = c.IMM * (2**(16 - 1))
+	mem_bit = 0
+	if imm_bit == 0:
+		mem_bit = 1 * (2**(16 - 1))
+	
 	def adjust_field(field):
-		#Hardwired immediate bit. Less flexible. Screw it.
-		imm_bit = 2 ** 67
-		
-		if "m" in field:
-			return int(field.strip("m"))
+		if "m" in field:				
+			return int(field.strip("m")) + mem_bit
 		return int(field) + imm_bit
 
 	fields = instr.split()
@@ -37,9 +39,6 @@ def parse_instr(instr):
 	z = fields[3]
 
 	return generate_instr(op, x, y, z, dest)
-
-
-
 
 cond_set = ["setifeq", "setiflt"]
 cond_add = ["addifeq", "addifneq", "addiflt"]
@@ -66,7 +65,7 @@ def gen_program():
 		goto start if mem[2] < 20
 	"""
 	start = "0 iterinput 0 0 0" #428
-	loop_1 = str(2) + " add 2m 1 0"
+	loop_1 = str(2) + " add 2m 1 666"
 	loop_2 = str(c.WI_PROGRAM_COUNTER) + " setiflt 2m 50 " + str(c.WI_PROGRAM_START)
 	end = "0 halt 0 0 0"	#431
 	

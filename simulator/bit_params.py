@@ -3,7 +3,7 @@ ENABLE_DEBUG = True
 MAX_CYCLES = 20
 
 NUM_BITS = 68
-NUM_LINES =  65536
+NUM_WORDS = NUM_LINES =  2**15
 MAX_WORD_SIZE = (2**NUM_BITS) - 1
 
 
@@ -20,6 +20,16 @@ M_X = 65535 << 4
 M_Y = M_X << 16
 M_Z = M_Y << 16
 M_DEST = M_Z << 16
+
+"""Mask for the field val (everything that's not the immediate bit)"""
+M_FVAL = NUM_WORDS - 1
+
+"""MSDigit mask for fields"""
+B_OPCODE = 8
+B_X = 32768
+B_Y = 32768
+B_Z = 32768
+B_DEST = 32768
 
 """Opcode values with shorthand"""
 ops = opcodes = {
@@ -39,8 +49,9 @@ ops = opcodes = {
 		"halt": 13,
 		"setiflt": 14,
 		"iterinput": 15}
-DictInvert = lambda d: dict(zip(d.values(), d.keys()))
-r_ops = DictInvert(ops)
+		
+dict_invert = lambda d: dict(zip(d.values(), d.keys()))
+r_ops = dict_invert(ops)
 
 IMM = 1
 
@@ -68,14 +79,16 @@ def Denary2Binary(n):
 	#
 	bStr = ''
 	#
-	if n < 0: raise ValueError, "must be a positive integer"
+	#if n < 0: raise ValueError, "must be a positive integer"
 	#
 	if n == 0: return '0'
 	#
-	while n > 0:
-	#
-		bStr = str(n % 2) + bStr
-		#
-		n = n >> 1
-		#
+	while n != 0:
+		if (1 & n) == 1:
+			bStr = '1' + bStr
+		else:
+			bStr =  '0' + bStr
+		n >>= 1
 	return bStr
+
+conv = Denary2Binary
