@@ -5,7 +5,7 @@ MAX_CYCLES = 50000
 NUM_BITS = 68
 NUM_WORDS = NUM_LINES =  2**15
 MAX_WORD_SIZE = (2**NUM_BITS) - 1
-
+SMALLISH_NUMBER = int(NUM_BITS / 6)
 
 """Shifts to get fields"""
 S_OPCODE = 0

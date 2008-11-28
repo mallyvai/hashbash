@@ -11,9 +11,7 @@ class IncIncRange:
 			self.upper = bound0
 			
 	def __contains__(self, num):
-		return num >= self.lower and num <= self.upper:
-
-
+		return num >= self.lower and num <= self.upper
 
 class OpProbRange:
 
@@ -32,10 +30,15 @@ simp_ops = OpProbRange(["nand", "xor", "or", "not"], 75, 95)
 spec_ops = OpProbRange(["iterinput"], 95, 99)
 
 prob_branch = IncIncRange(0, 95)
-prob_backward = IncIncRange(0, 59)
-prob_forward = IncIncRange(59, 99)
+prob_branch_backward = IncIncRange(0, 59)
+prob_branch_forward = IncIncRange(59, 99)
+prob_branch_mem = IncIncRange(0, 49)
+
 
 prob_dest_in_output = IncIncRange(0, 74)
 prob_source_in_input = IncIncRange(0, 59)
 prob_source_in_temp_regs = IncIncRange(60, 89)
 prob_source_in_output = IncIncRange(90, 99)
+
+prob_iter_backward = IncIncRange(0, 79)
+prob_iter_forward = IncIncRange(80, 99)

@@ -335,5 +335,6 @@ def simulate():
 	if c.ENABLE_DEBUG: tracker.output()
 	return out
 
-generate.gen_program()
-simulate()
+if __main__():
+	generate.gen_program()
+	simulate()
