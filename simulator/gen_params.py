@@ -23,11 +23,11 @@ class OpProbRange:
 		return num in self.prob_range
 
 
-cond_set = OpProbRange(["setifeq", "setiflt"], 0, 30)
-cond_add = OpProbRange(["addifeq", "addifneq", "addiflt"], 30, 50)
-comp_ops = OpProbRange(["mod", "add", "cshift", "shift"], 50, 75)
+cond_set = OpProbRange(["setifeq", "setiflt"], 0, 29)
+cond_add = OpProbRange(["addifeq", "addifneq", "addiflt"], 30, 49)
+comp_ops = OpProbRange(["mod", "add", "cshift", "shift"], 50, 74)
 simp_ops = OpProbRange(["nand", "xor", "or", "not"], 75, 95)
-spec_ops = OpProbRange(["iterinput"], 95, 99)
+spec_ops = OpProbRange(["iterinput"], 96, 99)
 
 prob_branch = IncIncRange(0, 95)
 prob_branch_backward = IncIncRange(0, 59)
@@ -39,6 +39,9 @@ prob_dest_in_output = IncIncRange(0, 74)
 prob_source_in_input = IncIncRange(0, 59)
 prob_source_in_temp_regs = IncIncRange(60, 89)
 prob_source_in_output = IncIncRange(90, 99)
+
+prob_is_mem = IncIncRange(0, 49)
+
 
 prob_iter_backward = IncIncRange(0, 79)
 prob_iter_forward = IncIncRange(80, 99)

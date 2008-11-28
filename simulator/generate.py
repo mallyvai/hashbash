@@ -30,112 +30,124 @@ def rand_instr(instr_index, end_instr_index):
 	"""
 	choose = lambda x: random.choice(x)
 	
-	dest = None
-	op = None
-	x = None
-	y = None
-	z = None
+	r_dest = None
+	r_op = None
+	r_x = None
+	r_y = None
+	r_z = None
 	
-	op_num = num_0 = random.randint(0, 100)
-	num_1 = random.randint(0, 100)
-	num_2 = random.randint(0, 100)
-	num_3 = random.randint(0, 100)
+	op_num = num_0 = random.randint(0, 99)
+	num_1 = random.randint(0, 99)
+	num_2 = random.randint(0, 99)
+	num_3 = random.randint(0, 99)
 	
 	"""
 	70% of the time, a source should refer to something in memory
 	30% of the time, a source should be an immediate
 	"""
-	
+	if bp.ENABLE_DEBUG: print "op_num", op_num
 	if op_num in gp.cond_set or op_num in gp.cond_add:
-		
-		op = choose(gp.cond_set.ops)
+		if bp.ENABLE_DEBUG: print "in cond set or add"
+		if op_num in gp.cond_add:
+			r_op = choose(gp.cond_add.ops)
+		else:
+			r_op = choose(gp.cond_set.ops)
 		
 		#50% of the time, x should be a valid program mem location
 		#50% of the time, x should be some not-too-large immediate.
 		if num_1 in gp.prob_branch_mem:
-			x = random.randint(WI_TEMP_REGS_START, instr_index) #hacky hacky
-			x = m_ify(z)
+			r_x = random.randint(bp.WI_TEMP_REGS_START, bp.WI_TEMP_REGS_START + instr_index) #hacky hacky
+			r_x = m_ify(r_x)
 		else:
-			x = random.randint(SMALLISH_NUMBER)
+			r_x = random.randint(0, bp.SMALLISH_NUMBER)
 		
 		#Similar for y except restrict it to the regs
 		if num_2 in gp.prob_branch_mem:
-			y = random.randint(WI_TEMP_REGS_START, WI_TEMP_REGS_END) #hacky hacky
-			y = m_ify(z)
+			r_y = random.randint(bp.WI_TEMP_REGS_START, bp.WI_TEMP_REGS_END) #hacky hacky
+			r_y = m_ify(r_y)
 		else:
-			y = random.randint(SMALLISH_NUMBER)
+			r_y = random.randint(0, bp.SMALLISH_NUMBER)
 		
 		if op_num in gp.cond_set:
-			if z in gp.prob_branch_backward:
-				z = random.randint(WI_PROGRAM_START, instr_index)
-			if z in gp.prob_branch_forward:
-				z = random.randint(instr_index + 1, end_instr_index)
-			gp.
-		if op_num in gp.cond_add:
-			dest = WI_PROGRAM_COUNTER
+			if r_z in gp.prob_branch_backward:
+				r_z = random.randint(bp.WI_PROGRAM_START, instr_index)
+			else:
+				r_z = random.randint(instr_index + 1, end_instr_index)
+		
+		else:
+			r_z = random.randint(0, end_instr_index-instr_index)
+		r_dest = bp.WI_PROGRAM_COUNTER
 		
 	elif op_num in gp.comp_ops or op_num in gp.simp_ops:
-		
+		if bp.ENABLE_DEBUG: print "in comp or simp"
 		if op_num in gp.comp_ops:
-			op = choose(gp.comp_ops.ops)
+			r_op = choose(gp.comp_ops.ops)
 		else:
-			op = choose(gp.simp_ops.ops)
+			r_op = choose(gp.simp_ops.ops)
 			
 		#70% of the time, have the destination be something in the output
 		#30% of the time, have the destination be something in temp reg range
 	
 		if num_1 in gp.prob_dest_in_output:
-			dest = random.randint(bp.WI_OUTPUT_START, bp.WI_OUTPUT_END + 1)
+			r_dest = random.randint(bp.WI_OUTPUT_START, bp.WI_OUTPUT_END + 1)
 		else:
-			dest = random.randint(bp.WI_TEMP_REGS_START, bp.WI_TEMP_REGS_END + 1)
+			r_dest = random.randint(bp.WI_TEMP_REGS_START, bp.WI_TEMP_REGS_END + 1)
 			
 		#60% of the time, operand X should be something in the input
 		#30% of the time, operand X should be something from the temp regs
 		#10% of the time, operand X should be something from the output
 		
 		if num_2 in gp.prob_source_in_input:
-			x = random.randint(bp.WI_INPUT_START, bp.WI_INPUT_END + 1)
+			r_x = random.randint(bp.WI_INPUT_START, bp.WI_INPUT_END + 1)
 		elif num_2 in gp.prob_source_in_temp_regs:
-			x = random.randint(bp.WI_TEMP_REGS_START, bp.WI_TEMP_REGS_END + 1)
+			r_x = random.randint(bp.WI_TEMP_REGS_START, bp.WI_TEMP_REGS_END + 1)
 		else: #num_2 in gp.prob_source_in_output:
-			x = random.randint(bp.WI_OUTPUT_START, bp.WI_OUTPUT_END + 1)
+			r_x = random.randint(bp.WI_OUTPUT_START, bp.WI_OUTPUT_END + 1)
 	
 		#60% of the time, operand Y should be something in the input
 		#30% of the time, operand Y should be something from the temp regs
 		#10% of the time, operand Y should be something from the output
 	
 		if num_3 in gp.prob_source_in_input:
-			y = random.randint(bp.WI_INPUT_START, bp.WI_INPUT_END + 1)
+			r_y = random.randint(bp.WI_INPUT_START, bp.WI_INPUT_END + 1)
 		elif num_3 in gp.prob_source_in_temp_regs:
-			y = random.randint(bp.WI_TEMP_REGS_START, bp.WI_TEMP_REGS_END + 1)
+			r_y = random.randint(bp.WI_TEMP_REGS_START, bp.WI_TEMP_REGS_END + 1)
 		else: #num_3 in gp.prob_source_in_output:
-			y = random.randint(bp.WI_OUTPUT_START, bp.WI_OUTPUT_END + 1)
+			r_y = random.randint(bp.WI_OUTPUT_START, bp.WI_OUTPUT_END + 1)
 	
 		#Operand Z is always a random number
-		z = random.getrandbits(16)
-		x = m_ify(y)
-		y = m_ify(y)
+		r_z = random.getrandbits(16)
+		r_x = prob_m_ify(r_x, gp.prob_is_mem)
+		r_y = m_ify(r_y)
 		
 	elif op_num in gp.spec_ops:
 		#80% of the time go backwards (XOR of bits in x is 0)
 		#20% of the time go forwards (XOR of bits in y is 1)
+		r_op = choose(gp.spec_ops.ops)
 		if num_1 in gp.prob_iter_forward:
-			x = 1
+			r_x = 1
 			desired = 0
 		else:
-			x = 0
+			r_x = 0
 			desired = 1
 		
 		#Hardwired hack. Change later.
-		while get_xor(x) != desired:
-			x = gp.getrandbits(16)
-		y = gp.getrandbits(16)
-		z = gp.getrandbits(16)
+		while get_xor(r_x) != desired:
+			r_x = random.getrandbits(16)
+		r_y = random.getrandbits(16)
+		r_z = random.getrandbits(16)
 		
 	else:
-		raise BadOperation("tried to create " + repr(op))
+		raise BadOperation("tried to create " + repr(r_op) + " " + repr(op_num))
 	
-	return ' '.join([dest, op, x, y, z])
+	if r_dest is None: r_dest = random.getrandbits(16)
+	if r_op is None: r_op = random.getrandbits(4)
+	if r_x is None: r_x = random.getrandbits(16)
+	if r_y is None: r_y = random.getrandbits(16)
+	if r_z is None: r_z = random.getrandbits(16)
+			
+	
+	return ' '.join([str(r_dest), str(r_op), str(r_x), str(r_y), str(r_z)])
 
 class BadOperation(Exception):
 	def __init__(self, value):
@@ -158,9 +170,8 @@ def parse_instr(instr):
 		return int(field) + imm_bit
 
 	fields = instr.split()
-	trans_fields = []
 
-	print "FIELDS: ", fields
+	if bp.ENABLE_DEBUG: print fields
 	op = fields.pop(1)
 	if op not in bp.ops:
 		raise BadOperation(op + " doesn't exist.")
@@ -186,37 +197,35 @@ def op_from_probs(num):
 def get_rand_bits(num_rand_bits, msd):
 	return random.randint(0, 2**num_rand_bits) | ( msd << (num_rand_bits - 1))
 
-def generate():
+def generate(num_rand_instrs):
 	"""
 	Basic structure:
 		do
-		
+		[ rand instructions ]
 		while mem[2] < mem[WI_TOTAL_INPUT_BLOCKS]
 		halt
 	"""
 	start = "0 iterinput 0 0 0"
+	rand_instrs = []
 	loop_1 = str(2) + " add 2m 1 666"
 	loop_2 = str(bp.WI_PROGRAM_COUNTER) + " setiflt 2m " + str(bp.WI_NUM_INPUT_BLOCKS) + "m " + str(bp.WI_PROGRAM_START)
 	halt = "0 halt 0 0 0"
 	seed = os.urandom(10)
 	random.seed(seed)
 	
-
-def gen_program():
-	"""Program:
-		iterinput
-		add 1 to tempvar mem[2]
-		goto start if mem[2] < 20
-	"""
-	start = "0 iterinput 0 0 0" #428
-	loop_1 = str(2) + " add 2m 1 666"
-	loop_2 = str(bp.WI_PROGRAM_COUNTER) + " setiflt 2m " + str(bp.WI_NUM_INPUT_BLOCKS) + "m " + str(bp.WI_PROGRAM_START)
-	end = "0 halt 0 0 0"	#431
+	for i in xrange(num_rand_instrs):
+		rand_instrs.append(rand_instr(i, num_rand_instrs + bp.WI_PROGRAM_START+1))
+	program = [start]
+	program.extend(rand_instrs)
+	program.extend([loop_1, loop_2, halt])
 	
-	program = '\n'.join([start, loop_1, loop_2, end])
 	
-	fh = open("/tmp/prog", 'w')
-	p = program.split("\n")
-	print "PROGRAM IS: ", p
-	fh.writelines([str(parse_instr(i))+"\n" for i in p])
+	#if bp.ENABLE_DEBUG: for line in program: print line
+	mc = [str(parse_instr(i))+"\n" for i in program]
+	return mc
+	
+if __name__ == "__main__":
+	fh = open(sys.argv[1], 'w')
+	mc = generate(200)
+	fh.write(''.join(mc))
 	fh.close()
