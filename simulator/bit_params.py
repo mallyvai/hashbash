@@ -1,6 +1,6 @@
-ENABLE_DEBUG = True
+ENABLE_DEBUG = False
 
-MAX_CYCLES = 20
+MAX_CYCLES = 50000
 
 NUM_BITS = 68
 NUM_WORDS = NUM_LINES =  2**15
@@ -65,8 +65,8 @@ WI_PROGRAM_COUNTER = 1 #Index in which the program counter is stored
 
 WI_TOTAL_INPUT_SIZE = 12 #The index of the word the total size of the input is going to be dumped into every time every time iterinput is called
 WI_BLOCK_SIZE = WI_TOTAL_INPUT_SIZE + 2 #Index of the word the block size for the input is going to be dumped into every time iterinput is called
-WI_NUM_BLOCKS = WI_BLOCK_SIZE + 2 #Index for number of blocks a call to iterinput will create
-WI_INPUT_START = WI_NUM_BLOCKS + 2 #Index of the word the input's going to start in
+WI_NUM_INPUT_BLOCKS = WI_BLOCK_SIZE + 2 #Index for number of blocks a call to iterinput will create
+WI_INPUT_START = WI_NUM_INPUT_BLOCKS + 2 #Index of the word the input's going to start in
 WI_INPUT_END = WI_INPUT_START + NUM_INPUT_BLOCKS - 1
 WI_OUTPUT_START = WI_INPUT_END + 1
 WI_OUTPUT_END = WI_OUTPUT_START + NUM_OUTPUT_BLOCKS - 1
