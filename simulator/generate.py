@@ -37,7 +37,7 @@ def rand_instr(instr_index):
 		
 		if num_1 in prob_branch:
 			dest = str(WI_PROGRAM_COUNTER)
-			amount = int(num_2 / 2) + 2
+			bamount = int(num_2 / 2) + 2
 			if amount <
 			
 			z = str(instr_index
@@ -52,11 +52,41 @@ def rand_instr(instr_index):
 		#70% of the time, have the destination be something in the output
 		#30% of the time, have the destination be something in temp reg range
 		
-		#75% of the time, operand A should be something in the input
-		#25% of the time, operand A should be something from the temp regs
+		if num_1 in gp.prob_dest_in_output:
+			dest = random.randint(WI_OUTPUT_START, WI_OUTPUT_END + 1)
+		else:
+			dest = random.randint(WI_TEMP_REGS_START, WI_TEMP_REGS_END + 1)
+			
+		#60% of the time, operand X should be something in the input
+		#30% of the time, operand X should be something from the temp regs
+		#10% of the time, operand X should be something from the output
 		
-		#75% of the time, operand B should be something in the input
-		#25% of the time, operand B should be something from the temp regs
+		if num_2 in gp.prob_source_in_input:
+			x = random.randint(WI_INPUT_START, WI_INPUT_END + 1)
+		elif num_2 in gp.prob_source_in_temp_regs:
+			x = random.randint(WI_TEMP_REGS_START, WI_TEMP_REGS_END + 1)
+		elif num_2 in gp.prob_source_in_output:
+			x = random.randint(WI_OUTPUT_START, WI_OUTPUT_END + 1)
+		else:
+			raise Exception("WTF")
+	
+		#60% of the time, operand Y should be something in the input
+		#30% of the time, operand Y should be something from the temp regs
+		#10% of the time, operand Y should be something from the output
+	
+		if num_2 in gp.prob_source_in_input:
+			x = random.randint(WI_INPUT_START, WI_INPUT_END + 1)
+		elif num_2 in gp.prob_source_in_temp_regs:
+			x = random.randint(WI_TEMP_REGS_START, WI_TEMP_REGS_END + 1)
+		elif num_2 in gp.prob_source_in_output:
+			x = random.randint(WI_OUTPUT_START, WI_OUTPUT_END + 1)
+		else:
+			raise Exception("WTF")
+	
+
+	
+		#Operand Z is always a random number
+	
 	
 	elif op_num in spec_ops:
 		#80% of the time go backwards

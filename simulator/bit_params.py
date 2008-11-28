@@ -48,8 +48,8 @@ ops = opcodes = {
 		"setifeq": 12,
 		"halt": 13,
 		"setiflt": 14,
-		"iterinput": 15}
-		
+		"iterinput": 15 }
+
 dict_invert = lambda d: dict(zip(d.values(), d.keys()))
 r_ops = dict_invert(ops)
 
@@ -58,12 +58,16 @@ IMM = 1
 WORD_SIZE = NUM_BITS
 BLOCK_SIZE = NUM_BITS
 BLOCK_MASK = 2**BLOCK_SIZE - 1
+
 NUM_INPUT_BLOCKS = 2 * 3 *  BLOCK_SIZE # Number of blocks a call to iterinput will start.
 NUM_OUTPUT_BLOCKS = 2 
+NUM_TEMP_REGS = 12 #Temporary Registers; or, empty space after the PC and other stuff
+
 #WI is Word Index; aka the location in memory
 WI_PROGRAM_COUNTER = 1 #Index in which the program counter is stored
-
-WI_TOTAL_INPUT_SIZE = 12 #The index of the word the total size of the input is going to be dumped into every time every time iterinput is called
+WI_TEMP_REGS_START = WI_PROGRAM_COUNTER + 1
+WI_TEMP_REGS_END = WI_TEMP_REGS_START + NUM_TEMP_REGS - 1
+WI_TOTAL_INPUT_SIZE = WI_TEMP_REGS_END + 1 #The index of the word the total size of the input is going to be dumped into every time every time iterinput is called
 WI_BLOCK_SIZE = WI_TOTAL_INPUT_SIZE + 2 #Index of the word the block size for the input is going to be dumped into every time iterinput is called
 WI_NUM_INPUT_BLOCKS = WI_BLOCK_SIZE + 2 #Index for number of blocks a call to iterinput will create
 WI_INPUT_START = WI_NUM_INPUT_BLOCKS + 2 #Index of the word the input's going to start in

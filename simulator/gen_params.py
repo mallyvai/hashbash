@@ -34,3 +34,8 @@ spec_ops = OpProbRange(["iterinput"], 95, 99)
 prob_branch = IncIncRange(0, 95)
 prob_backward = IncIncRange(0, 59)
 prob_forward = IncIncRange(59, 99)
+
+prob_dest_in_output = IncIncRange(0, 74)
+prob_source_in_input = IncIncRange(0, 59)
+prob_source_in_temp_regs = IncIncRange(60, 89)
+prob_source_in_output = IncIncRange(90, 99)
