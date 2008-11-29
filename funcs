@@ -33,7 +33,7 @@ not
 mod
 add x, y, z - if z's MSB is 0, add. if 1, sub.
 
-cshift circular shift ( LSB of z is 0 means right shift, 1 means left by that much)
+cshift circular shift ( XOR z is 0 means right shift, 1 means left by that much)
 shift regular shift  (same as above)
 
 padding - no, pointless. we have shifts
@@ -42,6 +42,11 @@ slicing operator(?)
 addifeq(x,y,z) add z to memory if x == y this is a ternary operator. joy. 
 addifneq(x,y,z) add z to memory if x != y
 addiflt(x,y,z) add z to memory if x < y
+
+setifeq(x,y,z) set z = memory if x == y
+setifneq(x,y,z) set z = memory if x != y
+setiflt(x,y,z) set z = memory if x < y
+
 
 nin x if LSB of x is 1, go forward (dump the next input block); otherwise, go backwards.
 dumped input block is of size

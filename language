@@ -1,3 +1,6 @@
+i want to change the MSD to XOR of all the bits.
+
+
 Everything is a combination of functions. No loops. No recursion. Just loops. Global variables allowed.
 
 -------> Is a hash function turing complete? (do the operations that *need* to be in a hash function allow it turing completeness)
