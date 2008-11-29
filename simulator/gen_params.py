@@ -1,5 +1,7 @@
 import random
 
+num_rnd_instrs = 150
+
 class IncIncRange:
 	
 	def __init__(self, bound0, bound1):

@@ -226,6 +226,6 @@ def generate(num_rand_instrs):
 	
 if __name__ == "__main__":
 	fh = open(sys.argv[1], 'w')
-	mc = generate(200)
+	mc = generate(gp.num_rnd_instrs)
 	fh.write(''.join(mc))
 	fh.close()
