@@ -223,9 +223,12 @@ def generate(num_rand_instrs):
 	#if bp.ENABLE_DEBUG: for line in program: print line
 	mc = [str(parse_instr(i))+"\n" for i in program]
 	return mc
-	
-if __name__ == "__main__":
-	fh = open(sys.argv[1], 'w')
+
+def main(filename):
+	fh = open(filename, 'w')
 	mc = generate(gp.num_rnd_instrs)
 	fh.write(''.join(mc))
 	fh.close()
+	
+if __name__ == "__main__":
+	main(sys.argv[1])

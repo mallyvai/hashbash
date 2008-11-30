@@ -350,9 +350,11 @@ def simulate(filename, input_string):
 	if c.ENABLE_DEBUG: tracker.output()
 	return out
 
+def main(filename, input_string):
+	output = simulate(filename, input_string)
+	return output
+
 if __name__ == "__main__":
-	#generate.gen_program()
 	input_string = raw_input("String you want to hash:\n")
-	output = simulate(sys.argv[1], input_string)
-	
+	output = main(sys.argv[1], input_string)
 	print output
