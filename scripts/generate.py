@@ -118,7 +118,7 @@ def rand_instr(instr_index, end_instr_index):
 		#Operand Z is always a random number
 		r_z = random.getrandbits(16)
 		r_x = prob_m_ify(r_x, gp.prob_is_mem)
-		r_y = m_ify(r_y)
+		r_y = prob_m_ify(r_y, gp.prob_is_mem)
 		
 	elif op_num in gp.spec_ops:
 		#80% of the time go backwards (XOR of bits in x is 0)

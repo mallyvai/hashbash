@@ -55,7 +55,7 @@ r_ops = dict_invert(ops)
 
 IMM = 1
 
-WORD_SIZE = NUM_BITS
+#WORD_SIZE = NUM_BITS
 BLOCK_SIZE = NUM_BITS
 BLOCK_MASK = 2**BLOCK_SIZE - 1
 

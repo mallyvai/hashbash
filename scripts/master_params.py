@@ -6,3 +6,6 @@ kill_num = lambda : int(max_num / 2)
 
 #Maximum number of allowed workers
 max_num_workers = 6
+
+mcode_suffix = ".mc"
+fit_suffix = ".fit"

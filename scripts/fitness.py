@@ -21,32 +21,61 @@ def attempt(memory, input_string, ht):
 def trivial(memory, ht):
 	"""
 	Handles the trivial case of bad functions that don't really do anything.
-	
 	"""
+	collisions = 0
+	for i in xrange(fp.trivial.lower, fp.trivial.upper):
+		collisions += attempt(memory, str(i), ht)
+	return collisions
 
-def collision(memory, ht):
+def multi_test(memory, ht):
 	random.seed(fp.collision_seed)
 	
 	collisions = 0
-	
+	total = 0
 	#stage one - a bunch of random numbers. smallish ones.
 	for i in xrange(fp.one.attempts):
 		input_string = random.uniform(fp.one.lower, fp.one.upper)
 		collisions += attempt(memory, input_string, ht)
-	
+		total += 1
+		
 	#stage two - a bunch of random strings, medium-ish ones.
 	for i in xrange(fp.two.attempts):
 		size = random.randint(fp.two.lower, gp.two.upper)
 		rnd_str = random_string(size)
 		collisions += attempt(memory, rnd_str, ht)
+		total += 1
 	
 	#stage three - iterate the range through which we went through in one
 	for i in xrange(fp.one.lower, fp.one.upper):
 		collisions += attempt(memory, str(i), ht)
+		total += 1
 	
-	return collisions
-	
+	return collisions, total
 
+class TrivialHashFunction(Exception):
+	def __init__(self, value):
+		self.value = value
+	def __str__(self):
+		return repr(self.value)
+
+
+def main(memory):
+	ht = {}
+	
+	collisions  = trivial(memory, ht)
+	if collisions != 0:
+		return 100
+	
+	collisions, total = multi_test(memory, ht)
+	return collisions / total
+	
 if __name__ == "__main__":
 	in_filename = sys.argv[1]
 	out_filename = sys.argv[2]
+	
+	fh = open(in_filename)
+	lines = fh.readlines()
+	fh.close()
+	
+	memory = simulate.initialize_memory(in_filename)
+	main(memory)

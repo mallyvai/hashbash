@@ -265,30 +265,33 @@ class Program:
 			if xor_z == 1: y *= -1 #sub if the relevant bit is 1
 			if c.ENABLE_DEBUG: print "X+Y=", x+y
 			if c.ENABLE_DEBUG: print "X", x,"","Y", y
-			m[dest] = (x + y) % 0x100000000000000000 #Because we have 68-bit words, 2^68 is the modulus
+			m[dest] = x + y
 		elif f_op == c.ops["shift"]:
 			y = abs(y)
+			y %= sys.maxint
 			
 			if xor_z == 1:
-				m[dest] = restricted_left_shift(x, y, c.WORD_SIZE)	 #shift left
+				m[dest] = restricted_left_shift(x, y, c.NUM_BITS)	 #shift left
 			else:  #shift right
 				m[dest] = x >> y
 		elif f_op == c.ops["cshift"]:
 			y = abs(y)
+			y %= sys.maxint
+			
 			if xor_z == 1:
-				m[dest] = restricted_circ_left_shift(x, y, c.WORD_SIZE)
+				m[dest] = restricted_circ_left_shift(x, y, c.NUM_BITS)
 			else:
-				m[dest] = restricted_circ_right_shift(x, y, c.WORD_SIZE)
+				m[dest] = restricted_circ_right_shift(x, y, c.NUM_BITS)
 				
 		elif f_op == c.ops["addifeq"]:
 			if x == y:
-				m[dest] = (m[dest] + z) % c.MAX_WORD_SIZE + 1
+				m[dest] = m[dest] + z
 		elif f_op == c.ops["addifneq"]:
 			if x != y:
-				m[dest] = (m[dest] + z) % c.MAX_WORD_SIZE + 1
+				m[dest] = m[dest] + z
 		elif f_op == c.ops["addiflt"]:
 			if x < y:
-				m[dest] = (m[dest] + z) % c.MAX_WORD_SIZE + 1
+				m[dest] = m[dest] + z
 		
 		elif f_op == c.ops["setifeq"]:
 			if x == y:
@@ -306,6 +309,8 @@ class Program:
 			self.is_halted = True
 		else:
 			raise BadOpcode(f_op)
+
+		m[dest] %= 0x100000000000000000 #Because we have 68-bit words, 2^68 is the modulus
 
 def prettify_instr(instr):
 	f_op = get_field(instr, c.M_OPCODE, c.S_OPCODE)
@@ -342,7 +347,6 @@ def initialize_memory(filename):
 
 	
 	fh = open(filename, 'r')
-	#if c.ENABLE_DEBUG: fh = open("/tmp/prog", 'r')
 	lines = fh.readlines()
 	fh.close()
 	
@@ -351,7 +355,12 @@ def initialize_memory(filename):
 	while len(memory) < c.NUM_LINES:
 		memory.append(0)
 
-	if c.ENABLE_DEBUG: input_string =  """memory.extend([int(line) for line in lines if line[0] != '#' and len(line.strip()) > 0]) ValueError: invalid literal for int() with base 10:"""
+	"""
+	Experimental: Initialize all temporary registers to random values.
+	"""
+	
+	memory[c.WI_TEMP_REGS_START: c.WI_TEMP_REGS_END+1] = [random.getrandbits(c.NUM_BITS) for i in xrange(c.WI_TEMP_REGS_END + 1 - c.WI_TEMP_REGS_START)]
+			
 	if c.ENABLE_DEBUG: print "beginning simulation"
 	
 	return memory
@@ -372,6 +381,7 @@ def simulate(memory, input_string):
 		
 	out = p.get_output()
 	if c.ENABLE_DEBUG: tracker.output()
+	
 	return out
 
 def main(filename, input_string):
