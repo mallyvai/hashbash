@@ -31,6 +31,7 @@ def restricted_left_shift(num, shift_amount, num_bits):
 	word_mask = (2**num_bits) - 1
 	return (num << shift_amount) & word_mask;
 def restricted_circ_left_shift(num, shift_amount, num_bits):
+	shift_amount %= num_bits
 	return restricted_left_shift(num, shift_amount, num_bits) | (num >> (num_bits - shift_amount))
 def restricted_circ_right_shift(num, shift_amount, num_bits):
 	return restricted_circ_left_shift(num, num_bits-shift_amount, num_bits)
@@ -80,6 +81,23 @@ def test_reverse_bits():
 	print "13 should be 11", 13, reverse_bits(13)
 	print "0 should be 0:", 0, reverse_bits(0)	
 	print "7 should be 7:", 7, reverse_bits(7)
+
+import random
+def test_program_output():
+	memory = [0 for i in xrange(c.NUM_WORDS)]
+	
+	running = 0
+	
+	for i in xrange(c.WI_OUTPUT_START, c.WI_OUTPUT_END+1):
+		num = random.getrandbits(c.NUM_BITS)
+		running <<= c.NUM_BITS
+		running += num
+		memory[i] = num
+		
+	program = Program(memory, "blah")
+	output = program.get_output()
+	print "it says", running
+	print "num is ", output
 
 class st_input:
 	"""
@@ -135,7 +153,6 @@ class Program:
 		self.memory[c.WI_BLOCK_SIZE] = c.BLOCK_SIZE #Index of the word the block size for the input is going to be dumped into every time iterinput is called
 		self.memory[c.WI_NUM_INPUT_BLOCKS] = c.NUM_INPUT_BLOCKS #Index for number of blocks a call to iterinput will create
 		
-	
 	def __init__(self, memory, inputstring):
 		self.memory = memory
 				
@@ -161,9 +178,7 @@ class Program:
 			
 		m = self.memory
 		
-		
-		
-		pc = m[c.WI_PROGRAM_COUNTER]		
+		pc = m[c.WI_PROGRAM_COUNTER]
 		pc = abs(pc)
 		
 		if pc > c.NUM_WORDS: instr = c.ops["halt"]
@@ -317,7 +332,12 @@ class MemTrack:
 				if w != 0:
 					print j, ' '.join(prettify_instr(w))
 
-def initialize(filename, input_string):
+"""
+Opportunity for mad-scientist experiment: let full state of program be
+transferred on reset - self-extending polymorphic code? Not impossible.
+Merely very unlikely.
+"""
+def initialize_memory(filename):
 	memory = [0 for i in xrange(0, c.WI_PROGRAM_START)]
 
 	
@@ -334,10 +354,10 @@ def initialize(filename, input_string):
 	if c.ENABLE_DEBUG: input_string =  """memory.extend([int(line) for line in lines if line[0] != '#' and len(line.strip()) > 0]) ValueError: invalid literal for int() with base 10:"""
 	if c.ENABLE_DEBUG: print "beginning simulation"
 	
-	return Program(memory, input_string)
-	
+	return memory
 
-def simulate(p):
+def simulate(memory, input_string):
+	p = Program(memory, input_string)
 	if c.ENABLE_DEBUG: tracker = MemTrack([0])
 	
 	i = 0
@@ -355,8 +375,8 @@ def simulate(p):
 	return out
 
 def main(filename, input_string):
-	program = initialize(filename, input_string)
-	output = simulate(program)
+	memory = initialize_memory(filename)
+	output = simulate(memory, input_string)
 	return output
 
 if __name__ == "__main__":
