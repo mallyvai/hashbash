@@ -316,7 +316,8 @@ class MemTrack:
 			for j, w in enumerate(v):
 				if w != 0:
 					print j, ' '.join(prettify_instr(w))
-def simulate(filename, input_string):
+
+def initialize(filename, input_string):
 	memory = [0 for i in xrange(0, c.WI_PROGRAM_START)]
 
 	
@@ -330,11 +331,14 @@ def simulate(filename, input_string):
 	while len(memory) < c.NUM_LINES:
 		memory.append(0)
 
-	if c.ENABLE_DEBUG: tracker = MemTrack([0])
-
 	if c.ENABLE_DEBUG: input_string =  """memory.extend([int(line) for line in lines if line[0] != '#' and len(line.strip()) > 0]) ValueError: invalid literal for int() with base 10:"""
 	if c.ENABLE_DEBUG: print "beginning simulation"
-	p = Program(memory, input_string)
+	
+	return Program(memory, input_string)
+	
+
+def simulate(p):
+	if c.ENABLE_DEBUG: tracker = MemTrack([0])
 	
 	i = 0
 	while i < c.MAX_CYCLES and not p.is_halted:
@@ -351,7 +355,8 @@ def simulate(filename, input_string):
 	return out
 
 def main(filename, input_string):
-	output = simulate(filename, input_string)
+	program = initialize(filename, input_string)
+	output = simulate(program)
 	return output
 
 if __name__ == "__main__":
