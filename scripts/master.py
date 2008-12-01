@@ -6,6 +6,7 @@ import simulate
 import random
 import tempfile
 import shutil
+import fitness
 
 path_dir = lambda generation: os.path.abspath(os.path.join(mp.computation_directory, str(generation)))
 
@@ -73,7 +74,7 @@ def measure_program(filename):
 	out_filename = filename[:-1*len(mp.mcode_suffix)]+mp.fit_suffix
 	print in_filename, out_filename
 	memory = simulate.initialize_memory(in_filename)
-	ratio = main(memory)
+	ratio = fitness.main(memory)
 	
 	statistics = [ratio]
 	
@@ -85,13 +86,13 @@ def measure_program(filename):
 	os.close(tmp_fh)
 	
 	fh = open(tmp_name, 'w')
-	fh.write([str(i) for i in statistics])
+	fh.write(''.join([str(i) for i in statistics]))
 	fh.close()
 	
 	#I hope to god this cannot fail in-transit. Please please please be atomic.
 	shutil.move(tmp_name, out_filename)
 	
-	os.remove(tmp_name)
+#	os.remove(tmp_name)
 
 def initialize():
 	make_next_dir(0)
@@ -105,7 +106,6 @@ def handle_generation(num):
 	pool = proc.Pool(mp.max_num_workers)
 	
 	unmeasured = find_unmeasured(path)
-	print unmeasured
 	pool.map(measure_program, unmeasured)
 	
 	#We now have fitness function output for every program in this directory.
@@ -113,7 +113,7 @@ def handle_generation(num):
 	ordered_candidates = filtered_filenames(path)
 	partners = choose_partners(ordered_candidates)
 	for i in partners:
-		print unmeasured
+		print i
 	#Breeding time.
 	#pool.map(breed_fittest, partners)
 

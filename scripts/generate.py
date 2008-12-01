@@ -4,7 +4,6 @@ psyco.full()
 import random
 import sys
 import os
-import math
 import bit_params as bp
 import gen_params as gp
 
