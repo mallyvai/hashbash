@@ -43,7 +43,7 @@ def multi_test(memory, ht):
 		
 	#stage two - a bunch of random strings, medium-ish ones.
 	for i in xrange(fp.two.attempts):
-		size = random.randint(fp.two.lower, gp.two.upper)
+		size = random.randint(fp.two.lower, fp.two.upper)
 		rnd_str = random_string(size)
 		collisions += attempt(memory, rnd_str, ht)
 		total += 1

@@ -2,6 +2,16 @@ import sys
 import random
 import breed_params as rp
 
+def mutate(chrom):
+	chrom = chrom[:]
+	mutate_this_many = random.randint(rp.min_instructions_mutated, rp.max_instructions_mutated)
+	words_to_mutate = random.sample(range(len(chrom)), mutate_this_many)
+	for i in words_to_mutate:
+		chrom[i] = int(chrom[i])
+		#use a distribution such that higher bits have lower probability of being selected
+		chrom[i] &= random.getrandbits(68)
+	return chrom
+
 def double_concatenation(one, two):
 	"""
 	Concatenate the chromosomes, and remove some number of elements from the middle
@@ -37,11 +47,14 @@ def double_concatenation(one, two):
 	
 	ret_chrom = ret_chrom[:rem_start] + ret_chrom[rem_end + 1:]
 	
+	if random.randint(0, 99) in rp.prob_mutate:
+		ret_chrom = mutate(ret_chrom)
+
 	return ret_chrom
-	
+
 if __name__ == "__main__":
 	
-	print "usage: child parent_1 parent_2 "
+	#usage: child parent_1 parent_2
 	
 	fh = open(sys.argv[2], 'r')
 	one = fh.readlines()	
@@ -54,4 +67,3 @@ if __name__ == "__main__":
 	fh = open(sys.argv[1], 'w')
 	child = double_concatenation(one, two)
 	fh.write(''.join(child))
-	print "done"
