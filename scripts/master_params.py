@@ -6,8 +6,8 @@ max_num_functions = lambda : 50
 min_new_functions = lambda : int(.1 * max_num_functions())
 max_new_functions = lambda : int(0.5 * max_num_functions())
 
-max_bred_functions = lambda : mp.max_num_functions() - mp.min_new_funcs()
-min_bred_functions = lambda : mp.max_num_functions() - mp.max_new_funcs()
+max_bred_functions = lambda : max_num_functions() - min_new_functions()
+min_bred_functions = lambda : max_num_functions() - max_new_functions()
 
 #Maximum number of allowed workers
 max_num_workers = 6

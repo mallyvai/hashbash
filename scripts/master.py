@@ -4,8 +4,10 @@ import os
 import generate
 import simulate
 import random
+import tempfile
+import shutil
 
-path_dir = lambda num: os.path.join(mp.computation_directory, str(num))
+path_dir = lambda generation: os.path.abspath(os.path.join(mp.computation_directory, str(generation)))
 
 def make_next_dir(gen_num):
 	dirname = path_dir(str(gen_num))
@@ -13,8 +15,9 @@ def make_next_dir(gen_num):
 	return dirname
 
 
-def find_unmeasured_programs(path):
+def find_unmeasured(path):
 	path_files = os.listdir(path)
+	path_files = [os.path.join(path, filename) for filename in path_files]
 	code_files = [filename for filename in path_files if mp.mcode_suffix in filename ]
 	
 	unmeasured = []
@@ -58,28 +61,51 @@ def choose_partners(ordered_candidates):
 	Random selection
 	"""
 	final_candidates = []
-	num_to_breed = random.randint(mp.min_bred_functions, mp.max_bred_functions)
+	num_to_breed = random.randint(mp.min_bred_functions(), mp.max_bred_functions())
 	for i in xrange(num_to_breed):
 		final_candidates.append( (random.choice(ordered_candidates), random.choice(ordered_candidates)) )
 
 def breed_fittest(one, two):
 	None
 
+def measure_program(filename):
+	in_filename = filename
+	out_filename = filename[:-1*len(mp.mcode_suffix)]+mp.fit_suffix
+	print in_filename, out_filename
+	memory = simulate.initialize_memory(in_filename)
+	ratio = main(memory)
+	
+	statistics = [ratio]
+	
+	#We create the file.
+	tmp_tuple = tempfile.mkstemp(dir="/tmp/")
+	tmp_fh = tmp_tuple[0]
+	tmp_name = tmp_tuple[1]
+	
+	os.close(tmp_fh)
+	
+	fh = open(tmp_name, 'w')
+	fh.write([str(i) for i in statistics])
+	fh.close()
+	
+	#I hope to god this cannot fail in-transit. Please please please be atomic.
+	shutil.move(tmp_name, out_filename)
+	
+	os.remove(tmp_name)
 
 def initialize():
 	make_next_dir(0)
+	path = path_dir(0)
 	for i in xrange(mp.max_num_functions()):
-		generate.main(path_dir(i))
+		filename = os.path.join(path, str(i)+mp.mcode_suffix)
+		generate.main(filename)
 
 def handle_generation(num):
 	path = path_dir(num)
 	pool = proc.Pool(mp.max_num_workers)
 	
 	unmeasured = find_unmeasured(path)
-	
-	for i in unmeasured:
-		print unmeasured
-	
+	print unmeasured
 	pool.map(measure_program, unmeasured)
 	
 	#We now have fitness function output for every program in this directory.
@@ -93,3 +119,4 @@ def handle_generation(num):
 
 if __name__ == "__main__":
 	initialize()
+	handle_generation(0)
