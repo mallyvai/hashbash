@@ -393,17 +393,20 @@ def main(filename, input_string):
 	output = simulate(memory, input_string)
 	return output
 
-"""
-def test_this_shit(filename):
-	initialize_memory(filename)
+
+def someone_help(filename):
+	memories = [initialize_memory(filename) for i in xrange(10)]
+	print len(memories)
 	
-	trackers = []
-	
-	for i in xrange(10):
-		p = Program(memory
-		tracker = MemTrack[0]
-	#	tracker.next_state(
-"""
+	i = 0
+	while i < len(memories):
+		
+		memory = [str(j) for j in memories[i]]
+		fh = open("/tmp/helpme/"+str(i), 'w')
+		fh.write('\n'.join(memory))
+		fh.close()
+		i+=1
+
 if __name__ == "__main__":
 	input_string = raw_input("String you want to hash:\n")
 	output = main(sys.argv[1], input_string)
