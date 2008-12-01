@@ -1,11 +1,22 @@
-computation_directory = "../computation/"
+computation_directory = "/tmp/testgen"
 
 #The maximum number of programs that can be in a given generation
-max_num_functions = lambda : 50
-kill_num = lambda : int(max_num / 2)
+max_num_functions = lambda : 50 
+#The minimum number of functions that have to be new
+min_new_functions = lambda : int(.1 * max_num_functions())
+max_new_functions = lambda : int(0.5 * max_num_functions())
+
+max_bred_functions = lambda : mp.max_num_functions() - mp.min_new_funcs()
+min_bred_functions = lambda : mp.max_num_functions() - mp.max_new_funcs()
 
 #Maximum number of allowed workers
 max_num_workers = 6
 
 mcode_suffix = ".mc"
 fit_suffix = ".fit"
+
+#li is line index.
+li_trivial = 0
+threshold_trivial = .8
+
+li_multi = 1

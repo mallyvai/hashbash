@@ -1,3 +1,6 @@
+import psyco
+psyco.full()
+
 import random
 import sys
 import os

@@ -1,3 +1,6 @@
+import psyco
+psyco.full()
+
 import random
 import sys
 import simulate
@@ -46,9 +49,9 @@ def multi_test(memory, ht):
 		total += 1
 	
 	#stage three - iterate the range through which we went through in one
-	for i in xrange(fp.one.lower, fp.one.upper):
-		collisions += attempt(memory, str(i), ht)
-		total += 1
+	#for i in xrange(fp.one.lower, fp.one.upper):
+	#	collisions += attempt(memory, str(i), ht)
+	#	total += 1
 	
 	return collisions, total
 
@@ -64,7 +67,7 @@ def main(memory):
 	
 	collisions  = trivial(memory, ht)
 	if collisions != 0:
-		return 100
+		return 1.0
 	
 	collisions, total = multi_test(memory, ht)
 	return collisions / total
@@ -73,9 +76,9 @@ if __name__ == "__main__":
 	in_filename = sys.argv[1]
 	out_filename = sys.argv[2]
 	
-	fh = open(in_filename)
-	lines = fh.readlines()
-	fh.close()
-	
 	memory = simulate.initialize_memory(in_filename)
-	main(memory)
+	ratio = main(memory)
+	
+	fh = open(out_filename, 'w')
+	fh.write(str(ratio))
+	fh.close()
