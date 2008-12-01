@@ -362,7 +362,7 @@ def initialize_memory(filename):
 	"""
 	Experimental: Initialize all temporary registers to random values.
 	"""
-	
+	random.seed(c.MUNROE_RANDNUM)
 	memory[c.WI_TEMP_REGS_START: c.WI_TEMP_REGS_END+1] = [random.getrandbits(c.NUM_BITS) for i in xrange(c.WI_TEMP_REGS_END + 1 - c.WI_TEMP_REGS_START)]
 			
 	if c.ENABLE_DEBUG: print "beginning simulation"
