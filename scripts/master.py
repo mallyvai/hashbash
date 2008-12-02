@@ -13,7 +13,7 @@ import breed
 import processing as proc
 import master_params as mp
 import gen_params as gp
-
+import fit_tests
 def gen_dir(gen_num):
 	base = str(gen_num) + mp.generation_suffix
 	if gen_num is None or len(str(gen_num)) == 0:
@@ -48,8 +48,8 @@ def filtered_filenames(num):
 
 	#Trivial screening
 	for filename in filenames:
-		cur_prefix = filename[:-1*len(mp.fit_suffix)]
-		cur_suffix = filename[-1*len(mp.fit_suffix):]
+		cur_prefix = filename[:-len(mp.fit_suffix)]
+		cur_suffix = filename[-len(mp.fit_suffix):]
 		if cur_suffix == mp.fit_suffix:
 			fh = open(filename)
 			lines = fh.readlines()
@@ -60,12 +60,11 @@ def filtered_filenames(num):
 	
 	#candidates that have information about the (very expensive) randomness test
 	advanced_candidates = []
-	for candidate, fit in candidates.iteritems():
-		if len(fit) > 2: #hacky hacky\
+	for candidate, fit in candidates.items():
+		if len(fit) > len(fit_tests.basic_tests):
 			advanced_candidates.append((candidate, fit))
 			del candidates[candidate]
-	
-	
+
 	basic_candidates = [(candidate, fit) for candidate, fit in candidates.iteritems()]
 	
 	basic_candidates.sort(lambda x, y: cmp(x[1][mp.li_trivial], y[1][mp.li_trivial]))
@@ -100,7 +99,7 @@ def breed_fittest(partner_filenames):
 	two = fh.readlines()
 	fh.close()
 	
-	child = breed.double_concatenation(one, two)
+	child = breed.breed(one, two)
 	
 	#Append the child's parents as a comment.
 	
@@ -110,13 +109,12 @@ def breed_fittest(partner_filenames):
 
 def measure_program(filename):
 	in_filename = filename
-	out_filename = filename[:-1*len(mp.mcode_suffix)]+mp.fit_suffix
+	out_filename = filename[:-len(mp.mcode_suffix)]+mp.fit_suffix
 	
 	memory = simulate.initialize_memory(in_filename)
-	ratio = fitness.main(memory)
+	ratios = fitness.main(memory)
 	
-	statistics = [ratio]
-	
+	statistics = ratios
 	#We create the file.
 	tmp_tuple = tempfile.mkstemp(dir="/tmp/")
 	tmp_fh = tmp_tuple[0]
@@ -125,7 +123,7 @@ def measure_program(filename):
 	os.close(tmp_fh)
 	
 	fh = open(tmp_name, 'w')
-	fh.write(''.join([str(i) for i in statistics]))
+	fh.write('\n'.join([str(i) for i in statistics]))
 	fh.close()
 	
 	#I hope to god this cannot fail in-transit. Please please please be atomic.
@@ -170,9 +168,7 @@ def create_generation(num):
 	#Breeding time.
 	
 	result = pool.map_async(breed_fittest, partners)
-	
-	result.wait()
-	
+	result.wait()	
 	children = result.get()
 	
 	

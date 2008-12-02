@@ -10,3 +10,4 @@ class Stage:
 trivial = Stage(20, -10, 10, 0)
 one = Stage(50, -100000, 100000, 0)
 two = Stage(50, 30, 80, 0)
+three = Stage(50, 1, 2**200, 0)

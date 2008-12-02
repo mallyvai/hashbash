@@ -1,10 +1,12 @@
+import psyco
+psyco.full()
+
 import sys
 import random
 import breed_params as rp
 import bit_params as bp
 
 def mutate(chrom):
-	chrom = chrom[:]
 	min_mut = rp.min_instructions_mutated
 	max_mut = min(len(chrom) - 1, rp.max_instructions_mutated)
 	
@@ -20,30 +22,38 @@ def mutate(chrom):
 		chrom[i] = str(chrom[i]) + "\n" #I didn't add this line. Fixing this bug caused me untold hours of pain. Next iteration needs a better object model...
 	return chrom
 
+def separate_comments(cell):
+	comments = []
+	code = []
+	for line in cell:
+		if line.isspace() or len(line) == 0: None
+		elif "#" in line : comments.append(line)
+		else: code.append(line)
+	return code, comments
+
+
+def breed(one, two):
+	one_code, one_comments = separate_comments(one)
+	two_code, two_comments = separate_comments(two)
+	
+	ret_chrom = double_concatenation(one_code, two_code)
+	
+	if random.randint(0, 99) in rp.prob_mutate:
+		ret_chrom = mutate(ret_chrom)
+
+	return ret_chrom
+
 def double_concatenation(one, two):
 	"""
 	Concatenate the chromosomes, and remove some number of elements from the middle
 	to get the overall length to within a few cells of the "average"
 	"""
-	
-	def separate_comments(cell):
-		comments = []
-		code = []
-		for line in cell:
-			if line.isspace() or len(line) == 0: None
-			elif "#" in line : comments.append(line)
-			else: code.append(line)
-		return code, comments
-	
-	one_code, one_comments = separate_comments(one)
-	two_code, two_comments = separate_comments(two)
-	
+		
+		
 	ret_chrom = []
 	
-	ret_chrom.extend(one_code)
-	ret_chrom.extend(two_code)
-	
-	
+	ret_chrom.extend(one)
+	ret_chrom.extend(two)
 	
 	"""
 	Choose indices i, j s.t
@@ -68,8 +78,6 @@ def double_concatenation(one, two):
 	
 	ret_chrom = ret_chrom[:rem_start] + ret_chrom[rem_end + 1:]
 	
-	if random.randint(0, 99) in rp.prob_mutate:
-		ret_chrom = mutate(ret_chrom)
 	return ret_chrom
 
 if __name__ == "__main__":
