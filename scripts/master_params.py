@@ -10,7 +10,7 @@ max_bred_functions = lambda : max_num_functions() - min_new_functions()
 min_bred_functions = lambda : max_num_functions() - max_new_functions()
 
 #Maximum number of allowed workers
-max_num_workers = 1
+max_num_workers = 20
 
 mcode_suffix = ".mc"
 fit_suffix = ".fit"

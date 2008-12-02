@@ -201,7 +201,16 @@ class NoGenerationsExist(Exception):
 def find_biggest_generation():
 	path = gen_dir("")
 	contents = glob.glob(gen_dir("*"))
-	contents.sort(reverse=True)
+	
+	def int_part(pathname):
+		base = os.path.basename(pathname)
+		name = base[:-len(mp.generation_suffix)]
+		print int(name)
+		return int(name)
+	print "CONTENTS%%%%%%%%%%", contents
+	contents.sort(key=int_part, reverse=True)
+	
+	print "CONTENTS~~~~~~~", contents
 	if len(contents) == 0: raise NoGenerationsExist(path)
 	return contents[0], int(os.path.basename(contents[0])[:-len(mp.generation_suffix)])
 
@@ -230,4 +239,4 @@ if __name__ == "__main__":
 			os.mkdir(mp.computation_directory)
 	except IndexError: None
 	
-	main(5)
+	main(40)
