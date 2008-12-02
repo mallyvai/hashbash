@@ -73,7 +73,6 @@ def filtered_filenames(num):
 	
 	filtered_candidates = advanced_candidates + basic_candidates
 	
-	print filtered_candidates
 	return [i[0]+mp.mcode_suffix for i in filtered_candidates]
 
 def choose_partners(ordered_candidates):
@@ -89,8 +88,6 @@ def choose_partners(ordered_candidates):
 	return final_candidates
 
 def breed_fittest(partner_filenames):
-	print "MADE IT THIS FAR"
-	print partner_filenames
 	
 	one_name = partner_filenames[0]
 	two_name = partner_filenames[1]
@@ -103,22 +100,18 @@ def breed_fittest(partner_filenames):
 	two = fh.readlines()
 	fh.close()
 	
-	print "pre-breeding"
-	
 	child = breed.double_concatenation(one, two)
 	
-	print "post-breeding"
-	
 	#Append the child's parents as a comment.
-	
+	print "closer"
 	child.append(''.join(["\n#",str(one_name), ";", str(two_name)]))
-	print "done"
+	
 	return child
 
 def measure_program(filename):
 	in_filename = filename
 	out_filename = filename[:-1*len(mp.mcode_suffix)]+mp.fit_suffix
-	print in_filename, out_filename
+	
 	memory = simulate.initialize_memory(in_filename)
 	ratio = fitness.main(memory)
 	
@@ -153,7 +146,7 @@ def measure_generation(num):
 	pool = proc.Pool(mp.max_num_workers)
 
 	path = gen_dir(num)
-	print "measuring path"
+	
 	unmeasured = find_unmeasured(path)
 	pool.map(measure_program, unmeasured)
 	
@@ -173,17 +166,20 @@ def create_generation(num):
 	#Lets arrange them by the fittest discarding the stupid ones.
 	ordered_candidates = filtered_filenames(str(num-1))
 	partners = choose_partners(ordered_candidates)
-	print "PARTNERS------------", partners
-	#Breeding time.
 	
+	#Breeding time.
+	print "prolly gonna vomit soon"
 	result = pool.map_async(breed_fittest, partners)
+	print "wtf"
 	result.wait()
+	print "waa"
 	children = result.get()
 	
+	print "almost..."
 	num_randgen = random.randint(mp.min_new_functions(), mp.max_new_functions())
 	for i in xrange(num_randgen):
 		children.append(generate.generate(gp.num_rnd_instrs))
-	
+	print "oh god?"
 	os.mkdir(gen_dir(num))
 	
 	for child, i in zip(children, xrange(len(children))):
@@ -220,7 +216,7 @@ def main(additional_generations_to_create):
 		initialize()
 		biggest_path, biggest_num = find_biggest_generation()
 
-	print biggest_path, biggest_num
+	
 	for i in xrange(biggest_num, biggest_num + additional_generations_to_create):
 		measure_generation(i)
 		create_generation(i+1)

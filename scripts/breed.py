@@ -1,16 +1,23 @@
 import sys
 import random
 import breed_params as rp
+import bit_params as bp
 
 def mutate(chrom):
 	chrom = chrom[:]
-	mutate_this_many = random.randint(rp.min_instructions_mutated, rp.max_instructions_mutated)
+	min_mut = rp.min_instructions_mutated
+	max_mut = min(len(chrom) - 1, rp.max_instructions_mutated)
+	
+	if len(chrom) <= rp.min_instructions_mutated: min_mut = 1
+	
+	mutate_this_many = random.randint(min_mut, max_mut)
 	words_to_mutate = random.sample(range(len(chrom)-1), mutate_this_many)
 	for i in words_to_mutate:
 		chrom[i] = int(chrom[i])
 		#use a distribution such that higher bits have lower probability of being selected
 		print "ABOUT TO VOMIT"
 		chrom[i] &= random.getrandbits(68)
+		chrom[i] %= bp.MAX_WORD_SIZE
 	return chrom
 
 def double_concatenation(one, two):
@@ -19,12 +26,11 @@ def double_concatenation(one, two):
 	to get the overall length to within a few cells of the "average"
 	"""
 	
-	
 	def separate_comments(cell):
 		comments = []
 		code = []
 		for line in cell:
-			if len(line) == 0: None
+			if line.isspace() or len(line) == 0: None
 			elif "#" in line : comments.append(line)
 			else: code.append(line)
 		return code, comments
@@ -64,7 +70,7 @@ def double_concatenation(one, two):
 	
 	if random.randint(0, 99) in rp.prob_mutate:
 		ret_chrom = mutate(ret_chrom)
-
+	print "close now"
 	return ret_chrom
 
 if __name__ == "__main__":
