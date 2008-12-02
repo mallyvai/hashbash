@@ -78,6 +78,11 @@ def double_concatenation(one, two):
 	
 	ret_chrom = ret_chrom[:rem_start] + ret_chrom[rem_end + 1:]
 	
+	#Make sure that the function doesn't balloon out of control
+	difference = len(ret_chrom) - rp.hard_size_limit
+	if difference > 0:
+		for i in xrange(difference):
+			ret_chrom.pop(int(len(ret_chrom)/2))
 	return ret_chrom
 
 if __name__ == "__main__":

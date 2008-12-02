@@ -7,3 +7,5 @@ max_instructions_mutated = 5
 min_instructions_mutated = 0
 
 prob_mutate = gp.IncIncRange(0, 20)
+
+hard_size_limit = 5000
