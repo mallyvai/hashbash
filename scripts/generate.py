@@ -212,6 +212,8 @@ def generate_1(num_rand_instrs):
 	loop_1 = str(2) + " add 2m 1 666"
 	loop_2 = str(bp.WI_PROGRAM_COUNTER) + " setiflt 2m " + str(bp.WI_NUM_INPUT_BLOCKS) + "m " + str(bp.WI_PROGRAM_START)
 	halt = "0 halt 0 0 0"
+	cmnt= "#origin: generate_1"
+	
 	seed = os.urandom(10)
 	random.seed(seed)
 	
@@ -224,6 +226,7 @@ def generate_1(num_rand_instrs):
 	
 	#if bp.ENABLE_DEBUG: for line in program: print line
 	mc = [str(parse_instr(i))+"\n" for i in program]
+	mc.append(cmnt+"\n")
 	return mc
 
 def generate_2(num_rand_instrs):
@@ -233,32 +236,48 @@ def generate_2(num_rand_instrs):
 	rand_instrs = []
 	loop_1 = str(2) + " add 2m 1 666"
 	halt = "0 halt 0 0 0"
+	cmnt= "#origin: generate_2"
+	
 	seed = os.urandom(10)
 	random.seed(seed)
 	
 	for i in xrange(num_rand_instrs):
 		rand_instrs.append(rand_instr(i, num_rand_instrs + bp.WI_PROGRAM_START+1))
 	program = [start]
-	program.extend(rand_instrs)
+	program.extend(rand_instrs)	
 	program.extend([halt])
-	
-	
 	#if bp.ENABLE_DEBUG: for line in program: print line
 	mc = [str(parse_instr(i))+"\n" for i in program]
+	mc.append(cmnt+"\n")
 	return mc
 
-def dumb_program(useless):
+def dumb_program_1(useless):
 	start = "0 iterinput 0 0 0"
 	mid = str(bp.WI_OUTPUT_START) + " add" + " 0 " + str(bp.WI_INPUT_START) + "m " + " 0 "
 	halt = "0 halt 0 0 0"
+	cmnt= "#origin: dumb_program_1"
+	
 	program = [start,mid,halt]
+	mc = [str(parse_instr(i))+"\n" for i in program]
+	mc.append(cmnt+"\n")
+	return mc
+
+def dumb_program_2(useless):
+	start = "0 iterinput 0 0 0"
+	mid_1 = str(bp.WI_OUTPUT_END) + " add" + " 0 " + str(bp.WI_INPUT_START+1) + "m " + " 0 "
+	mid_2 = str(bp.WI_OUTPUT_START) + " nand" + " 0 " + str(bp.WI_INPUT_START) + "m " + " 0 "
+	halt = "0 halt 0 0 0"
+	cmnt= "#origin: dumb_program_2"
+	program = [start,mid_1, mid_2, halt]
 	
 	mc = [str(parse_instr(i))+"\n" for i in program]
+	mc.append(cmnt+"\n")
 	return mc
 
 def generate(num_rnd_instrs):
-	return dumb_program(num_rnd_instrs)
-	
+	func = random.choice([dumb_program_1, dumb_program_2, generate_2, generate_1])
+	return func(num_rnd_instrs)
+
 
 def main(filename):
 	fh = open(filename, 'w')
