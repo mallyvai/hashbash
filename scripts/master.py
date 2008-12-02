@@ -111,7 +111,7 @@ def breed_fittest(partner_filenames):
 	
 	#Append the child's parents as a comment.
 	
-	child.append(''.join(["\n#",one_name, ";", two_name]))
+	child.append(''.join(["\n#",str(one_name), ";", str(two_name)]))
 	print "done"
 	return child
 
@@ -234,4 +234,4 @@ if __name__ == "__main__":
 			os.mkdir(mp.computation_directory)
 	except IndexError: None
 	
-	main(2)
+	main(5)
