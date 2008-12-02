@@ -17,7 +17,7 @@ fit_suffix = ".fit"
 
 #li is line index.
 li_trivial = 0
-threshold_trivial = -1
+threshold_trivial = 0.8
 li_multi = 1
 
 generation_suffix = ".gen"

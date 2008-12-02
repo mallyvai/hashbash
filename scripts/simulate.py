@@ -187,10 +187,8 @@ class Program:
 		
 		if pc > c.NUM_WORDS: instr = c.ops["halt"]
 
-		
+		else: instr = m[pc]
 		m[c.WI_PROGRAM_COUNTER] += 1 #pc++
-		instr = m[pc]
-		
 			
 		def get_xor(field):
 			ret = 1 & field
