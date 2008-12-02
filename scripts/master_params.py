@@ -22,3 +22,5 @@ threshold_trivial = .8
 li_multi = 1
 
 generation_suffix = ".gen"
+
+lockfile_name = "stop.lock"

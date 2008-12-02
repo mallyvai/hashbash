@@ -4,6 +4,7 @@ import tempfile
 import shutil
 import glob
 import sys
+import time
 
 import generate
 import simulate
@@ -27,7 +28,13 @@ def make_next_dir(gen_num):
 	os.mkdir(dirname)
 	return dirname
 
-
+#Look for the lockfile in directory
+#If the lockfile is found, pause execution
+def pause_on_lockfile():
+	path = gen_dir("")
+	while mp.lockfile_name in os.listdir(path):
+		time.sleep(10)
+		
 def find_unmeasured(path):
 	path_files = os.listdir(path)
 	path_files = [os.path.join(path, filename) for filename in path_files]
@@ -223,9 +230,10 @@ def main(additional_generations_to_create):
 
 	
 	for i in xrange(biggest_num, biggest_num + additional_generations_to_create):
-		
+		pause_on_lockfile()
 		measure_generation(i)
 		print "Measured", str(i),
+		pause_on_lockfile()
 		create_generation(i+1)
 		print "Moved", str(i+1)
 		
@@ -236,6 +244,6 @@ if __name__ == "__main__":
 		if sys.argv[1] == "-f":
 			shutil.rmtree(mp.computation_directory)
 			os.mkdir(mp.computation_directory)
+		elif sys.argv[1] == "-n":
+			main(int(sys.argv[2]))
 	except IndexError: None
-	
-	main(10)
