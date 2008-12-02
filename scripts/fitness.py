@@ -8,6 +8,7 @@ import gen_params as gp
 import fit_params as fp
 import fit_tests
 
+
 #Because there is a chance that we attempt to hash the same thing twice,
 #we will have to store pretty much everything
 def attempt(memory, input_string, ht):

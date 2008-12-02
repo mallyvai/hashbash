@@ -1,6 +1,5 @@
 files, files, files.
-i should be able to create and execute arbitrarily many "gen_algo" processes to do the actual calculation of this damn thing.
-i also want to store all previous generations.
-also a lockfile for 'pause' so i can go ahead and manually prune this.
+(done) i should be able to create and execute arbitrarily many "gen_algo" processes to do the actual calculation of this damn thing.
+(done) i also want to store all previous generations.
+(not done. pointless?)also a lockfile for 'pause' so i can go ahead and manually prune this.
 a given instance should go ahead and pause AT ANY TIME.
-for a given generation,

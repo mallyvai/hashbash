@@ -1,3 +1,6 @@
+import psyco
+psyco.full()
+
 import os
 import random
 import tempfile
@@ -6,12 +9,13 @@ import glob
 import sys
 import time
 
+import processing as proc
+
 import generate
 import simulate
 import fitness
 import breed
 
-import processing as proc
 import master_params as mp
 import gen_params as gp
 import fit_tests

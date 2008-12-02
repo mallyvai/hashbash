@@ -1,7 +1,10 @@
-import simulate
-import fit_params as fp
+import psyco
+psyco.full()
+
 import random
 
+import simulate
+import fit_params as fp
 
 def random_string(length):
 	return ''.join([chr(random.getrandbits(8)) for i in xrange(length)])
@@ -18,16 +21,16 @@ def trivial(memory, ht, attempt):
 	"""
 	Handles the trivial case of bad functions that don't really do anything.
 	"""
-	collisions = 0
-	total = 0
+	collisions = 0.0
+	total = 0.0
 	for i in xrange(fp.trivial.lower, fp.trivial.upper):
 		collisions += attempt(memory, str(i), ht)
 		total += 1
 	return collisions/total
 
 def stage_one(memory, ht, attempt):
-	collisions = 0
-	total = 0
+	collisions = 0.0
+	total = 0.0
 	#stage one - a bunch of random numbers. smallish ones.
 	for i in xrange(fp.one.attempts):
 		input_string = random.uniform(fp.one.lower, fp.one.upper)
@@ -36,8 +39,8 @@ def stage_one(memory, ht, attempt):
 	return collisions/total
 
 def stage_two(memory, ht, attempt):
-	collisions = 0
-	total = 0
+	collisions = 0.0
+	total = 0.0
 	#stage two - a bunch of random strings, medium-ish ones.
 	for i in xrange(fp.two.attempts):
 		size = random.randint(fp.two.lower, fp.two.upper)
@@ -48,8 +51,8 @@ def stage_two(memory, ht, attempt):
 	
 def stage_three(memory, ht, attempt):
 	#stage three - the shifting test. start off with 1 and keep shifting it for a long time.
-	collisions = 0
-	total = 0
+	collisions = 0.0
+	total = 0.0
 	counter = fp.three.lower
 	for i in xrange(fp.three.attempts):
 		counter >>= 1
