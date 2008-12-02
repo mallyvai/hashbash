@@ -103,7 +103,7 @@ def breed_fittest(partner_filenames):
 	child = breed.double_concatenation(one, two)
 	
 	#Append the child's parents as a comment.
-	print "closer"
+	
 	child.append(''.join(["\n#",str(one_name), ";", str(two_name)]))
 	
 	return child
@@ -168,18 +168,18 @@ def create_generation(num):
 	partners = choose_partners(ordered_candidates)
 	
 	#Breeding time.
-	print "prolly gonna vomit soon"
+	
 	result = pool.map_async(breed_fittest, partners)
-	print "wtf"
+	
 	result.wait()
-	print "waa"
+	
 	children = result.get()
 	
-	print "almost..."
+	
 	num_randgen = random.randint(mp.min_new_functions(), mp.max_new_functions())
 	for i in xrange(num_randgen):
 		children.append(generate.generate(gp.num_rnd_instrs))
-	print "oh god?"
+	
 	os.mkdir(gen_dir(num))
 	
 	for child, i in zip(children, xrange(len(children))):
@@ -205,12 +205,12 @@ def find_biggest_generation():
 	def int_part(pathname):
 		base = os.path.basename(pathname)
 		name = base[:-len(mp.generation_suffix)]
-		print int(name)
+		
 		return int(name)
-	print "CONTENTS%%%%%%%%%%", contents
+	
 	contents.sort(key=int_part, reverse=True)
 	
-	print "CONTENTS~~~~~~~", contents
+	
 	if len(contents) == 0: raise NoGenerationsExist(path)
 	return contents[0], int(os.path.basename(contents[0])[:-len(mp.generation_suffix)])
 
@@ -227,8 +227,11 @@ def main(additional_generations_to_create):
 
 	
 	for i in xrange(biggest_num, biggest_num + additional_generations_to_create):
+		
 		measure_generation(i)
+		print "Measured", str(i),
 		create_generation(i+1)
+		print "Moved", str(i+1)
 		
 if __name__ == "__main__":
 	
@@ -239,4 +242,4 @@ if __name__ == "__main__":
 			os.mkdir(mp.computation_directory)
 	except IndexError: None
 	
-	main(40)
+	main(10)

@@ -15,9 +15,9 @@ def mutate(chrom):
 	for i in words_to_mutate:
 		chrom[i] = int(chrom[i])
 		#use a distribution such that higher bits have lower probability of being selected
-		print "ABOUT TO VOMIT"
 		chrom[i] &= random.getrandbits(68)
 		chrom[i] %= bp.MAX_WORD_SIZE
+		chrom[i] = str(chrom[i]) + "\n" #I didn't add this line. Fixing this bug caused me untold hours of pain. Next iteration needs a better object model...
 	return chrom
 
 def double_concatenation(one, two):
@@ -70,7 +70,6 @@ def double_concatenation(one, two):
 	
 	if random.randint(0, 99) in rp.prob_mutate:
 		ret_chrom = mutate(ret_chrom)
-	print "close now"
 	return ret_chrom
 
 if __name__ == "__main__":
