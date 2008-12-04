@@ -3,9 +3,9 @@
 \usepackage{cite}
 \usepackage[dvips]{graphicx}
 \usepackage{listings}
+\bibliographystyle{plain}
 
 \begin{document}
-
 \title{Hash Bash: Genetic Algorithms for Hash Function Generation}
 \author{Vaibhav Mallya}
 \maketitle
@@ -15,25 +15,29 @@
 This paper explores the use of genetic algorithms for the generation of hash functions. We define a custom Turing-complete assembly language to represent our generated functions. We evaluate fitness primarily from collision-resistance. We can test uniform output distribution only intermittently due to the length and expense of the randomness tests. Speed is guaranteed by a hard maximum cycle limit. Our results are limited, but we believe the approach is promising.
 
 \section{Introduction}
-Hash functions are key building blocks of modern cryptography, having applications in encryption, authentication protocols, and integrity verification schemes (http://wiki.theory.org/BitTorrentSpecification). Today's most widely-used hash functions are inspired by Rivest's MD2 (http://tools.ietf.org/html/rfc1319) and MD4, the designs of which are characterized by input chunking, substitution, and the repeated application of overlapping bitwise operations.
+Hash functions are key building blocks of modern cryptography, having applications in encryption algorithms, authentication protocols, and integrity verification schemes (http://wiki.theory.org/BitTorrentSpecification). Today's most widely-used hash functions are inspired by Rivest's MD2 (http://tools.ietf.org/html/rfc1319) and MD4, the designs of which are characterized by input chunking, substitution, and the repeated application of overlapping bitwise operations.
 
 \paragraph{}
-Although they are important to the integrity of many security schemes, most modern commonly-used hash functions, including SHA-1 and MD5 (hereafter referred to as Rivest functions), have either had serious attacks mounted against them or are in danger of being vulnerable in the near future. MD5 in particular can now be broken in under a minute on a commodity machine. (http://eprint.iacr.org/2005/067) As a result, an NIST competition has been initiated for the creation of a new cryptopgraphically secure function (http://csrc.nist.gov/groups/ST/hash/index.html). Unfortunately, hash function creation is an extremely difficult task, and vetting and verification takes a great deal of careful analysis. However, we show that it is possible to approximate a good hash function through the use of genetic algorithm.
+Although they are important to the soundness of many security schemes, most modern commonly-used hash functions, including SHA-1 and MD5 (hereafter referred to as Rivest functions), have either had serious attacks mounted against them or are in danger of being vulnerable in the near future.
+MD5 in particular can now be broken in under a minute on a commodity machine. (http://eprint.iacr.org/2005/067) As a result, an NIST competition has been initiated for the creation of a new cryptopgraphically secure function (http://csrc.nist.gov/groups/ST/hash/index.html). Unfortunately, hash function creation is an extremely difficult task, and vetting and verification takes a great deal of careful analysis.
+However, we show that it may be possible to approximate a good hash function through the use of the genetic algorithm.
 
 \paragraph{}
-The genetic algorithm is inspired by biological natural selection. John Holland of the University of Michigan pioneered its use in the 1970s (Holland, “Genetic algorithms and the optimal allocation of trials.” SIAM J. Comput., 2.88-105); however, it wasn't until the 1980s and 1990s that the computational capacity for practical implementations of the algorithm became readily available. The algorithm as we use it consists of a series of functions - a randomized generator, a fitness evaluator, and a breeder - that operate on chromomsomes, which are strings formed from a genetic description alphabet. The algorithm proceeds as follows:
+The genetic algorithm is inspired by biological natural selection. John Holland of the University of Michigan pioneered its use in the 1970s \cite{Holland1973}.
+However, it wasn't until the 1980s and 1990s that the computational capacity for practical implementations of the algorithm became readily available \cite{Goldberg}. The algorithm as we use it consists of a series of functions - a randomized generator, a fitness evaluator, and a breeder - that operate on chromomsomes, which are strings formed from a genetic description alphabet. The algorithm proceeds as follows:
 \begin{enumerate}
 	\item Create a random starting population of size S.
 	\item Evaluate the fitness of every member of the current generation.
 	\item Breed the fittest members to form the next generation.
 	\item Add random or old members until we have the next generation is once more of size S.
+	\item Randomly mutate some member(s) of the generation.
 	\item Go to step 2 if we're not done.
 \end{enumerate}
 
-With proper parameter selection and a sufficient amount of time, the genetic algorithm will converge to some local optimum. Holland's Schemata Theorem provides a more rigid explanation as to why this occurs (Holland, Adaptation in Natural and Artificial Systems, 1975).
+With proper parameter selection and a sufficient amount of time, the genetic algorithm will tend to converge to some local optimum. Since we are combining parts of the best solutions to form new solutions, it seems reasonable that this should happen. Holland's Schemata Theorem provides a more rigid explanation as to why this occurs (Holland, Adaptation in Natural and Artificial Systems, 1975).
 
 \section{Implementation Description}
-Since we are creating, breeding, and interpreting programs, we first choose a representation language that meets the following criteria:
+Since we are creating, breeding, and interpreting programs, we first need a language that meets the following criteria:
 
 \begin{enumerate}
 \item Readable enough to manually program and interpret.
@@ -41,9 +45,10 @@ Since we are creating, breeding, and interpreting programs, we first choose a re
 \item Compact enough that there are few-to-none overlapping or redundant operators.
 \item Flexible enough that syntax errors are impossible.
 \item Ability to implement all Rivest functions
+\item Represented in a way that allows the breeding of two functions to yield a better function with high probability
 \end{enumerate}
 \paragraph{}
- 
+An assembly language is an ideal candidate here. It's straightforward how machine code represents instructions, bitstrings are easy to manipulate, and dissassembly is easy to interpret. Additionally, interpreters are easy to find or even write.
 Although there are a number of special-purpose assembly languages that fulfill one or two of these criteria, we were unable to find any that fulfilled all of them. We created our own assembly language with the following characteristics:
 
 \begin{itemize}
@@ -51,29 +56,34 @@ Although there are a number of special-purpose assembly languages that fulfill o
 	\begin{itemize}
           \item Somewhat impractical to implement in hardware, but this is not a design goal.
 	\end{itemize}
-\item 2$^{15}$ words of memory, each 68 bits large.
-\item 15 operators, each allowing four 16-bit operands.
+	\item 2$^{15}$ words of memory, each 68 bits large.
+	\item 15 operators, each allowing four 16-bit operands.
 	\begin{itemize}
+		  \item Includes N/AND, X/OR, NOT, conditional sets, and conditional adds
           \item Every instruction does not utilize every operand.
           \item Leading bit of every operand indicates if the remaining 15 bits refer to an immediate or an address.
 	\end{itemize}
-\item Program counter stored in a fixed location in memory, allowing the program to modify it (i.e. branching).
-\item A special operator \textbf{iterinput} that fetches the next input chunk and places it in a fixed memory location.
-\item A fixed section of memory treated as an output buffer.
+	\item Program counter stored in a fixed location in memory, allowing the program to modify it (i.e. branching).
+	\item A special operator \textbf{iterinput} that fetches the next input chunk and places it in a fixed memory location.
+	\item This fixed section of memory is treated as an output buffer.
 \end{itemize}
 
-\paragraph{} 
-Although the algorithm itself views this language in terms of its machine code, the human-readable disassembly is straightforward, since instructions take the form \textbf{[dest] [op] [op0] [op2]}. The machine code itself is just a series of binary strings. This makes programs trivial to
+\paragraph{}
+Although the algorithm itself views this language in terms of its machine code, the human-readable disassembly is straightforward, since instructions take the form \textbf{[dest] [op] [op0] [op2]}. The machine code itself is just a series of binary strings. This makes programs trivial to:
 	\begin{itemize}
-	\item Generate: Given a template with gaps, randomly generate bitstrings of length 68 to fill the gaps
-	\item Breed: Simply join subsets of the parent chromsomes.
+	\item Generate: Given a template with "gaps", randomly generate bitstrings of length 68 to fill the gaps.
+	\item Breed: Concatenate the parent chromosomes.
+		\begin{itemize}
+			\item Hash functions concatenated should yield better hash functions, so logically, this is a good strategy.
+			\item If our child function is too large, we remove words from the middle.
+		\end{itemize}
 	\item Mutate: AND some random bitstring(s) of length 68 with some random word(s).
 	\end{itemize}
 
 Finally, it's obvious that we can duplicate all Rivest functions in a straightforward way - we have access to all the bitwise operators used, as well as simple chunking and branching.
 
 \section{Implementation Details}
-The genetic algorithm and custom simulator are implemented completely in Python, with the exception of the Diehard tests (http://www.stat.fsu.edu/pub/diehard/) which are written in C. There are four primary utility scripts: generate.py, fitness.py, simulate.py, breed.py. Each has a corresponding parameters file for simple fine-tuning. The script that ties all of these together to compute current and successive generations is master.py, which has its own parameters file.
+The genetic algorithm and custom language simulator are implemented completely in Python, with the exception of the Diehard tests (http://www.stat.fsu.edu/pub/diehard/) which are written in C. There are four primary utility scripts: generate.py, fitness.py, simulate.py, breed.py. Each has a corresponding parameters file for simple fine-tuning. The script that ties all of these together to compute current and successive generations is master.py, which has its own parameters file.
 
 \paragraph{}
 The primary performance bottleneck, the fitness testing, is completely parallelized, with a pool of processes that greedily grab functions to simulate and evaluate. Breeding is less of a performance concern, but it is also parallelized due to the ease with which it is possible. There are numerous additional opportunities for algorithmic parallelization that aren't utilized by our implementation.
@@ -81,28 +91,35 @@ The primary performance bottleneck, the fitness testing, is completely paralleli
 \paragraph{}
 Special mention must be given to Psyco (http://psyco.sourceforge.net/) and the processing module (http://pypi.python.org/pypi/processing/). Psyco improves individual script execution by utilizing a JIT compiler, while the processing module allows for quick and efficient parallelization of the algorithm itself.
 
-\paragraph{}	
-The fitness function consists of two main parts. First, it attempts to filter out trivially bad functions by hashing the elements in [-10, 10]. If the function fails this trivial test by colliding at all, it is flagged, and no further tests are conducted on it.
+\paragraph{}
+The fitness function consists of two main parts. First, it attempts to filter out trivially bad functions by hashing the elements in [-10, 10]. If the function fails this trivial test by colliding at all, it is flagged. No further tests are conducted on it.
 Next, it iterates over many random numbers, some of them very close to each other, to determine collision rates.
 The fitness function notes the ratio collisions $\div$ total inputs, and then terminates.
 It is important to note that randomness and uniformity tests are not conducted programmatically due to their cost. Over 68 million bytes are required for a single hash function's test. The intended procedure for randomness testing is as follows: 
 \begin{enumerate}
-\item Manually create the named lockfile in the computational results directory to pause the algorithm.
-\item Initiate the randomness tests by hand.
-\item Manually append the results of the test to the fitness file of the relevant function. 
-\item The results will then be accounted for in the following generation's selection and breeding process.
+	\item Manually create the named lockfile in the computational results directory to pause the algorithm.
+	\item Initiate the randomness tests by hand.
+	\item Manually append the results of the test to the fitness file of the relevant function. 
+	\item The results will then be accounted for in the following generation's selection and breeding process.
 \end{enumerate}
 
 \section{Computational Results}
-Unfortunately, the hash functions the algorithm currently generates are very weak, and would at best serve as CRCs or checksums of some sort. In all runs, we detected only minor differences between hash values for lexicographically adjacent inputs for all generated hash functions. 
+Unfortunately, the hash functions the algorithm currently generates are very weak, and would at best serve as CRCs or checksums of some sort. In all runs, we detected only minor differences between hash values for lexicographically adjacent inputs for all generated hash functions.
+There were also a distressingly high number of overall functions ($\geq$ 15\%) that produced only constants. Upon reexamination, we found several design decisions that seem to have contributed to poor quality.
+
+\begin{enumerate}
+\item Too many conditional operators.
+\item Poor generator function.
+\end{enumerate}
+
 \paragraph{}
 
-However, we believe this machine learning approach holds promise, and given more time, we feel we can produce more substantial and interesting results. There are two primary reasons. First, the randomized generator function is weak. There are in fact four structured generator functions provided, but only one of them is actually used, since the others never produce anything but constants. The single usable generator is itself a manually-created and very trivial hash function. It simply returns some number of bits from the first block of the input. For small inputs, it is a kind of perfect hash function (http://burtleburtle.net/bob/hash/perfect.html), and obviously produces collisions for longer inputs.
+However, we believe this machine learning approach holds promise, and given more time, we feel we can produce more substantial and interesting results. There are two primary reasons. First, the randomized generator function is weak. There are in fact four structured generator functions provided, but only one of them is actually used most of the time, since the others never produce anything but constants. The single usable generator is itself a manually-created and very trivial hash function. It simply returns some number of bits from the first block of the input. For small inputs, it is a kind of perfect hash function (http://burtleburtle.net/bob/hash/perfect.html), and obviously produces collisions for longer inputs.
 
 \paragraph{}
-Indeed, on first glance, it would seem like a poor candidate for an initial function. We conducted several runs ($\approx$ 50 generations) with the initial population consisting entirely of this function, which is 5 lines long. At the end of each of these runs, we noticed that there were two or three long functions ($>$300 lines) whose exact hash outputs varied slightly from their initial forms. The variation wasn't significant, but the fact that phenotypic variation existed at all is a hopeful sign. It stands to reason that if provided additional trivial hash functions that collectively exercised the full power of the assembly language, the generator would allow the algorithm to produce substantially more interesting input.
+Indeed, on first glance, it would seem like a poor candidate for an initial function. We conducted several runs ($\approx$ 50 generations) with the initial population consisting entirely of this function, which is 5 lines long. At the end of each of these runs, we noticed that there were two or three long functions ($>$300 lines) whose exact hash outputs varied slightly from their initial forms. The variation wasn't significant, but the fact that phenotypic variation existed at all is a hopeful sign. It stands to reason that if provided additional trivial hash functions that collectively exercised the full power of the assembly language the generator would help the algorithm to produce substantially more interesting input.
 
 \paragraph{}
-Secondly, the resources available for the purposes of this paper were limited. We had full-time access to a single dual-core machine that was frequently used for other tasks, and only one time-strapped developer. With the injection of additional human resources, the algorithm could be adapted to run on a cluster, the cloud, etc. It would definitely allow for more rapid convergence on interesting behavior.
-
-\end{document} 
+The resources available for the purposes of this paper were limited. We had full-time access to a single dual-core machine that was frequently used for other tasks, and only one fairly time-strapped developer. With the injection of additional human resources, the algorithm could be adapted to run on a cluster, the cloud, etc. It would definitely allow for more rapid convergence on interesting behavior.
+\bibliography{paper_cite}
+\end{document}
