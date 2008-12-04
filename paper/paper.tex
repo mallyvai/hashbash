@@ -15,11 +15,11 @@
 This paper explores the use of genetic algorithms for the generation of hash functions. We define a custom Turing-complete assembly language to represent our generated functions. We evaluate fitness primarily from collision-resistance. We can test uniform output distribution only intermittently due to the length and expense of the randomness tests. Speed is guaranteed by a hard maximum cycle limit. Our results are limited, but we believe the approach is promising.
 
 \section{Introduction}
-Hash functions are key building blocks of modern cryptography, having applications in encryption algorithms, authentication protocols, and integrity verification schemes (http://wiki.theory.org/BitTorrentSpecification). Today's most widely-used hash functions are inspired by Rivest's MD2 (http://tools.ietf.org/html/rfc1319) and MD4, the designs of which are characterized by input chunking, substitution, and the repeated application of overlapping bitwise operations.
+Hash functions are key building blocks of modern cryptography, having applications in encryption algorithms, authentication protocols, and integrity verification schemes \cite{Cohen}. Today's most widely-used hash functions are inspired by Rivest's MD2 \cite{RivestMD2} and MD4, the designs of which are characterized by input chunking, substitution, and the repeated application of overlapping bitwise operations. Although there numerous other hashing schemes, they are not as widely-used, and therefore, not a focus of this paper.
 
 \paragraph{}
 Although they are important to the soundness of many security schemes, most modern commonly-used hash functions, including SHA-1 and MD5 (hereafter referred to as Rivest functions), have either had serious attacks mounted against them or are in danger of being vulnerable in the near future.
-MD5 in particular can now be broken in under a minute on a commodity machine. (http://eprint.iacr.org/2005/067) As a result, an NIST competition has been initiated for the creation of a new cryptopgraphically secure function (http://csrc.nist.gov/groups/ST/hash/index.html). Unfortunately, hash function creation is an extremely difficult task, and vetting and verification takes a great deal of careful analysis.
+MD5 in particular can now be broken in under a minute on a commodity machine. \cite{cryptoeprint:2005:067} As a result, an NIST competition has been initiated for the creation of a new cryptopgraphically secure function \cite{NISTComp}. Unfortunately, hash function creation is an extremely difficult task, and vetting and verification takes a great deal of careful analysis.
 However, we show that it may be possible to approximate a good hash function through the use of the genetic algorithm.
 
 \paragraph{}
@@ -34,7 +34,7 @@ However, it wasn't until the 1980s and 1990s that the computational capacity for
 	\item Go to step 2 if we're not done.
 \end{enumerate}
 
-With proper parameter selection and a sufficient amount of time, the genetic algorithm will tend to converge to some local optimum. Since we are combining parts of the best solutions to form new solutions, it seems reasonable that this should happen. Holland's Schemata Theorem provides a more rigid explanation as to why this occurs (Holland, Adaptation in Natural and Artificial Systems, 1975).
+With proper parameter selection and a sufficient amount of time, the genetic algorithm will tend to converge to some local optimum. Since we are combining parts of the best solutions to form new solutions, it seems reasonable that this should happen. Holland's Schemata Theorem provides a more rigid explanation as to how this occurs \cite{citeulike:1281572}.
 
 \section{Implementation Description}
 Since we are creating, breeding, and interpreting programs, we first need a language that meets the following criteria:
@@ -83,13 +83,13 @@ Although the algorithm itself views this language in terms of its machine code, 
 Finally, it's obvious that we can duplicate all Rivest functions in a straightforward way - we have access to all the bitwise operators used, as well as simple chunking and branching.
 
 \section{Implementation Details}
-The genetic algorithm and custom language simulator are implemented completely in Python, with the exception of the Diehard tests (http://www.stat.fsu.edu/pub/diehard/) which are written in C. There are four primary utility scripts: generate.py, fitness.py, simulate.py, breed.py. Each has a corresponding parameters file for simple fine-tuning. The script that ties all of these together to compute current and successive generations is master.py, which has its own parameters file.
+The genetic algorithm and custom language simulator are implemented completely in Python, with the exception of the Diehard tests \cite{Diehard} which are written in C. There are four primary utility scripts: generate.py, fitness.py, simulate.py, breed.py. Each has a corresponding parameters file for simple fine-tuning. The script that ties all of these together to compute current and successive generations is master.py, which has its own parameters file.
 
 \paragraph{}
 The primary performance bottleneck, the fitness testing, is completely parallelized, with a pool of processes that greedily grab functions to simulate and evaluate. Breeding is less of a performance concern, but it is also parallelized due to the ease with which it is possible. There are numerous additional opportunities for algorithmic parallelization that aren't utilized by our implementation.
 
 \paragraph{}
-Special mention must be given to Psyco (http://psyco.sourceforge.net/) and the processing module (http://pypi.python.org/pypi/processing/). Psyco improves individual script execution by utilizing a JIT compiler, while the processing module allows for quick and efficient parallelization of the algorithm itself.
+We make extensive use of Psyco \cite{Psyco} and the processing module \cite{Processing}. Psyco improves individual script execution by utilizing a JIT compiler, while the processing module allows for quick and efficient parallelization of the algorithm itself.
 
 \paragraph{}
 The fitness function consists of two main parts. First, it attempts to filter out trivially bad functions by hashing the elements in [-10, 10]. If the function fails this trivial test by colliding at all, it is flagged. No further tests are conducted on it.
