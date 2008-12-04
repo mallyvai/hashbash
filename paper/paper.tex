@@ -36,7 +36,7 @@ However, it wasn't until the 1980s and 1990s that the computational capacity for
 
 With proper parameter selection and a sufficient amount of time, the genetic algorithm will tend to converge to some local optimum. Since we are combining parts of the best solutions to form new solutions, it seems reasonable that this should happen. Holland's Schemata Theorem provides a more rigid explanation as to how this occurs \cite{citeulike:1281572}.
 
-\section{Implementation Description}
+\section{Language Description}
 Since we are creating, breeding, and interpreting programs, we first need a language that meets the following criteria:
 
 \begin{enumerate}
@@ -77,19 +77,17 @@ Although the algorithm itself views this language in terms of its machine code, 
 			\item Hash functions concatenated should yield better hash functions, so logically, this is a good strategy.
 			\item If our child function is too large, we remove words from the middle.
 		\end{itemize}
-	\item Mutate: AND some random bitstring(s) of length 68 with some random word(s).
+	\item Mutate: AND some random bitstring(s) of length 68 with some random word(s). Also allow an additional word to be created with some small probability.
 	\end{itemize}
 
 Finally, it's obvious that we can duplicate all Rivest functions in a straightforward way - we have access to all the bitwise operators used, as well as simple chunking and branching.
 
-\section{Implementation Details}
+\section{Implementation Details and the Fitness Function}
 The genetic algorithm and custom language simulator are implemented completely in Python, with the exception of the Diehard tests \cite{Diehard} which are written in C. There are four primary utility scripts: generate.py, fitness.py, simulate.py, breed.py. Each has a corresponding parameters file for simple fine-tuning. The script that ties all of these together to compute current and successive generations is master.py, which has its own parameters file.
 
 \paragraph{}
-The primary performance bottleneck, the fitness testing, is completely parallelized, with a pool of processes that greedily grab functions to simulate and evaluate. Breeding is less of a performance concern, but it is also parallelized due to the ease with which it is possible. There are numerous additional opportunities for algorithmic parallelization that aren't utilized by our implementation.
-
-\paragraph{}
 We make extensive use of Psyco \cite{Psyco} and the processing module \cite{Processing}. Psyco improves individual script execution by utilizing a JIT compiler, while the processing module allows for quick and efficient parallelization of the algorithm itself.
+The primary performance bottleneck, the fitness testing, is completely parallelized, with a pool of processes that greedily grab functions to simulate and evaluate. Breeding is less of a performance concern, but it is also parallelized due to the ease with which it is possible. There are numerous additional opportunities for algorithmic parallelization that aren't utilized by our implementation.
 
 \paragraph{}
 The fitness function consists of two main parts. First, it attempts to filter out trivially bad functions by hashing the elements in [-10, 10]. If the function fails this trivial test by colliding at all, it is flagged. No further tests are conducted on it.
@@ -103,23 +101,34 @@ It is important to note that randomness and uniformity tests are not conducted p
 	\item The results will then be accounted for in the following generation's selection and breeding process.
 \end{enumerate}
 
+As a result of the expens, we base our results primarily on the collision rates of the generated functions.
+
 \section{Computational Results}
-Unfortunately, the hash functions the algorithm currently generates are very weak, and would at best serve as CRCs or checksums of some sort. In all runs, we detected only minor differences between hash values for lexicographically adjacent inputs for all generated hash functions.
+Unfortunately, the hash functions the algorithm currently generates are very weak, and would at best serve as CRCs or checksums of some sort. In all runs, we detected only minor differences between hash values for lexicographically adjacent inputs.
 There were also a distressingly high number of overall functions ($\geq$ 15\%) that produced only constants. Upon reexamination, we found several design decisions that seem to have contributed to poor quality.
 
+\subsection{1. Too many conditional operators}
+Out of 16 instructions, there are 3 conditional sets and 3 conditional adds. These were intended to be used for branching, so one of the generators actually creates branchs with an overly high probability. This obviously excludes bitwise operators that are supposed to do the bulk of the computation from appearing as much as would be ideal.
+
+\subsection{2. Poor generator function}
+There are in fact four structured generator functions provided, but only one of them is actually used most of the time, since the others never produce anything but constants. The single usable generator is itself a manually-created and very trivial hash function. It simply returns some number of bits from the first block of the input. For small inputs, it is a kind of perfect hash function (http://burtleburtle.net/bob/hash/perfect.html), and obviously produces collisions for longer inputs. Originally, we had intended to create a plethora of generators and randomly choose one when generating a new cell, but this was scrapped due to general generator ineffectiveness.
+
+\subsection{3. Too-large word size; too many words}
+These are related problems; the 68-bit word size is a by-product of wanting to address 2$^15$ words of memory with three operands. In retrospect, this was a terrible decision, since there is never a need to utilize anything beyond the first 2000 words or so for the program and all temporary variables. 2000 itself is a very generous upper bound.
+
+\subsection{4. Turing-completeness}
+Turing completeness grants the power to solve more difficult problems. But in the context of the genetic algorithm, it also leaves significant opportunities to solve even simple problems incorrectly. More power requires more responsibility, and the genetic algorithm is not responsible at all. As implemented in most languages, the Rivest functions' operators include looping and conditionals. However, when we look at diagrams of the functions themselves, we notice the information stream always "flows down". There is no flow backwards \cite{MD5Diagram}. We can therefore implement Rivest functions with a conditional relative branch whose offset is always positive. There is no need to have a negative branch value. There will be an obscene amount of code repetition with this design since we'll have to duplicate the code for every round over and over, but it's a computationally valid way of approaching the problem. By eliminating language features that allow Turing completeness, we can simply fitness testing and generation without sacrifing functionality of the hash function. To take advantage of this fact, we have to make the following changes to our language:
 \begin{enumerate}
-\item Too many conditional operators.
-\item Poor generator function.
+\list Remove the program counter from the unified memory, so it is not open to arbitrary modification.
+\list Add a new branch-on-equality operator with three operands.
+\list It should increment the program counter by \textbf{|op3|} if \textbf{op1} == \textbf{op2}
 \end{enumerate}
 
-\paragraph{}
+We feel this is an interesting point that merits further analysis.
 
-However, we believe this machine learning approach holds promise, and given more time, we feel we can produce more substantial and interesting results. There are two primary reasons. First, the randomized generator function is weak. There are in fact four structured generator functions provided, but only one of them is actually used most of the time, since the others never produce anything but constants. The single usable generator is itself a manually-created and very trivial hash function. It simply returns some number of bits from the first block of the input. For small inputs, it is a kind of perfect hash function (http://burtleburtle.net/bob/hash/perfect.html), and obviously produces collisions for longer inputs.
+\section{Further Thoughts and Conclusion}
+Despite all of this, we believe this approach holds promise, and given more time, we feel we can produce more substantial and interesting results. The justification for our optimism goes back to our generator function. As mentioned, it's a trivial hash function that just moves some subset of the input buffer into the output buffer. Indeed, on first glance, it would seem like a poor candidate for an initial function. However, we conducted several runs ($\approx$ 50 generations) with the initial population consisting entirely of this 5-line function. At the end of each of these runs, we noticed that there were two or three long functions ($>$300 lines) whose exact hash outputs varied slightly from their initial forms. The variation wasn't significant, but the fact that phenotypic variation existed at all is a hopeful sign. It stands to reason that if provided additional trivial hash functions that collectively exercised the full power of the assembly language, the generator would help the algorithm to produce substantially more interesting input.
 
-\paragraph{}
-Indeed, on first glance, it would seem like a poor candidate for an initial function. We conducted several runs ($\approx$ 50 generations) with the initial population consisting entirely of this function, which is 5 lines long. At the end of each of these runs, we noticed that there were two or three long functions ($>$300 lines) whose exact hash outputs varied slightly from their initial forms. The variation wasn't significant, but the fact that phenotypic variation existed at all is a hopeful sign. It stands to reason that if provided additional trivial hash functions that collectively exercised the full power of the assembly language the generator would help the algorithm to produce substantially more interesting input.
-
-\paragraph{}
-The resources available for the purposes of this paper were limited. We had full-time access to a single dual-core machine that was frequently used for other tasks, and only one fairly time-strapped developer. With the injection of additional human resources, the algorithm could be adapted to run on a cluster, the cloud, etc. It would definitely allow for more rapid convergence on interesting behavior.
+Also of importance the resources available for the purposes of this paper were limited. We only had part-time access to a single dual-core machine that was frequently used for other tasks, and only one (time-strapped) developer.  With the injection of additional human resources, the algorithm could be adapted to run on a cluster, the cloud, etc. It would definitely allow for more rapid convergence on interesting behavior. Since the algorithm is embarassingly parallel, we feel this would be an extremely feasible conversion.
 \bibliography{paper_cite}
 \end{document}
