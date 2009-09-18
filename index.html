@@ -52,15 +52,22 @@
       Using genetic algorithms to breed hash functions.
     </div>
 
-    <p>HashBash was a project for a cryptography class I took about a year ago. The <a href="http://csrc.nist.gov/groups/ST/hash/sha-3/index.html">NIST competition</a> for a new hash function had an approaching deadline, so I figured I may as well try and see if I could come up with any novel way to generate hash functions, and came to the idea of using a custom assembly language and genetic algorithms to try and breed one. This repo contains the 1.1k+ lines of Python I wrote over that week that comprises the simulator, generator, breeder, and fitness function.</p>
+    <p>HashBash was a project for a cryptography class I took about a year ago. It uses genetic programming with an as-yet unnamed custom assembly language to generate hash functions. I chose this project because the <a href="http://csrc.nist.gov/groups/ST/hash/sha-3/index.html">NIST competition</a> for a new hash function had an approaching deadline, and I figured I may as well try and see if I could come up with any novel way to try and create one :-) .</p>
+
+<p>This repository contains the 1.1k+ lines of Python I wrote over that week that comprises the simulator, generator, breeder, and fitness function.</p>
 <p>
 Unfortunately, the algorithm couldn't effectively generate a useful hash function, and only managed to breed a few checksums. The <a href="http://cloud.github.com/downloads/mallyvai/hashbash/paper.pdf">paper</a> goes into more detail.</p>
 <br>
 <p>
-The program itself may or may not work properly without err'ing somewhere - I finished the paper, made a few accidental modifications to the master branch, and never bothered to fix it- but I'm leaving it up here as an example of how things may be approached, what methods I used to get the results I did, and (hopefully) provide a base for anyone trying to improve on this idea in the future. :-)
+Additionally, the program itself may or may not work properly without err'ing somewhere - I finished the paper, made a few accidental modifications to the master branch, and never bothered to fix it- but I'm leaving it up here as an example of how things may be approached, what methods I used to get the results I did, and (hopefully) provide a base for anyone trying to improve on this idea in the future. :-)
 </p>
 <p>
-If you're interested, please read the <a href="http://cloud.github.com/downloads/mallyvai/hashbash/paper.pdf">paper</a>, which has detailed information concerning my rationale, approach, and outcomes. It also identifies (many) possible areas for improvement.</p><h2>Dependencies</h2>
+If you're interested, please read the <a href="http://cloud.github.com/downloads/mallyvai/hashbash/paper.pdf">paper</a>, which has detailed information concerning my rationale, approach, and outcomes. It also identifies (many) possible areas for improvement. </p>
+
+
+<p>As always, feel free to email me with questions or comments.</p>
+
+<h2>Dependencies</h2>
 <p>Python 2.5 or above (3.0 not supported yet)</p>
 <h2>License</h2>
 <p>GPL v2 (for now)</p>
